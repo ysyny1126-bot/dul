@@ -1,0 +1,20 @@
+rules_version = '2';
+// 둘 보안 규칙
+// - 로그인(익명 포함)한 사람만 읽고 쓸 수 있어요.
+// - 실제 회원의 프로필은 본인만 고칠 수 있어요. 가상 회원(1~500번)은 시연용이라 누구나 고칠 수 있어요.
+// - 정해진 컬렉션 말고는 아무것도 못 써요.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isVirtual(id) { return id.matches('^([1-9]|[1-9][0-9]|[1-4][0-9][0-9]|500)$'); }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && (request.auth.uid == uid || isVirtual(uid));
+    }
+    match /likes/{id}    { allow read, write: if signedIn(); }
+    match /signals/{id}  { allow read, write: if signedIn(); }
+    match /chats/{id}    { allow read, write: if signedIn(); }
+    match /chatimgs/{id} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.src.size() < 400000; }
+  }
+}

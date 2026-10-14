@@ -1,0 +1,16 @@
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+# 빌드 중간 결과 (src에서 다시 만들 수 있음)
+src/app_data.json
+src/gyeol_app.html
+src/match_results.json
+deploy/
+# 기타
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+Thumbs.db

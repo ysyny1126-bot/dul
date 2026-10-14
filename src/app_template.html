@@ -1,0 +1,1453 @@
+<title>둘</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Gaegu:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 파스텔 핑크 바탕 위에 흰 "게시물 카드"를 쌓는 휴대폰 폭 앱. 선은 코발트 손그림, 로고는 민트 테두리 글자 */
+:root {
+  --bg: #F7CFDC;
+  --app: #FDE6EE;
+  --surface: #FFFFFF;
+  --paper: #FFF6F9;
+  --ink: #6E3A55;
+  --muted: #B2809A;
+  --line: #F7D3DF;
+  --stroke: #F4A3C0;
+  --rose: #E5638F;
+  --accent: #E5638F;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #FFE8F0;
+  --heart: #FF6F9C;
+  --heart-soft: #FFE1EB;
+  --mint: #F9B4CB;
+  --mint-deep: #D2557F;
+  --accent2: #C0628A;
+  --accent2-soft: #FCE6EF;
+  --lilac: #EBDDFB;
+  --strip: #FFEDF3;
+  --chip: #FFEFF4;
+  --good: #4FA67A;
+  --bad: #D9486F;
+  --bad-soft: #FFE4EB;
+  --scrim: rgba(110, 58, 85, .35);
+  --shadow: 0 8px 22px rgba(229, 99, 143, .18);
+  --font-logo: "Black Han Sans", "Do Hyeon", sans-serif;
+  --font-display: "Do Hyeon", "Gowun Dodum", sans-serif;
+  --font-hand: "Gaegu", "Gowun Dodum", cursive;
+  --font-body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #2B1722; --app: #34202B; --surface: #3F2935; --paper: #3A2530; --ink: #FFE8F1; --muted: #D8A9BF; --line: #533645;
+    --stroke: #F59BBD; --rose: #FF8DB5; --accent: #FF8DB5; --accent-ink: #3A1424; --accent-soft: #4E2C3C; --heart: #FF85AC; --heart-soft: #5A2A3E;
+    --mint: #F59BBD; --mint-deep: #FFB3CD; --accent2: #FFB3CD; --accent2-soft: #4A2B39; --lilac: #43304F; --strip: #48303D; --chip: #48303D;
+    --good: #7FD4A4; --bad: #FF8FA8; --bad-soft: #552634; --scrim: rgba(0, 0, 0, .55); --shadow: 0 8px 22px rgba(0, 0, 0, .35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #2B1722; --app: #34202B; --surface: #3F2935; --paper: #3A2530; --ink: #FFE8F1; --muted: #D8A9BF; --line: #533645;
+  --stroke: #F59BBD; --rose: #FF8DB5; --accent: #FF8DB5; --accent-ink: #3A1424; --accent-soft: #4E2C3C; --heart: #FF85AC; --heart-soft: #5A2A3E;
+  --mint: #F59BBD; --mint-deep: #FFB3CD; --accent2: #FFB3CD; --accent2-soft: #4A2B39; --lilac: #43304F; --strip: #48303D; --chip: #48303D;
+  --good: #7FD4A4; --bad: #FF8FA8; --bad-soft: #552634; --scrim: rgba(0, 0, 0, .55); --shadow: 0 8px 22px rgba(0, 0, 0, .35); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--stroke); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+b { font-weight: 700; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+
+#app { max-width: 520px; min-height: 100%; margin: 0 auto; background: var(--app); position: relative; display: flex; flex-direction: column; }
+.pad { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* 로고: 흰 글자 + 민트 테두리 */
+.logo { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+.logo small { font-family: var(--font-mono); font-size: 9px; letter-spacing: .32em; color: var(--rose); margin-bottom: 3px; }
+.logo span { font-family: var(--font-logo); font-size: 32px; color: var(--surface); -webkit-text-stroke: 1.6px var(--rose); paint-order: stroke fill; text-shadow: 0 2px 0 var(--stroke); letter-spacing: .02em; }
+
+/* 상단바 */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--app); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
+.devsw { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink); cursor: pointer; border: 1.5px solid var(--stroke); background: var(--surface); border-radius: 999px; padding: 4px 10px 4px 5px; }
+.devsw .track { width: 26px; height: 16px; border-radius: 8px; background: var(--line); position: relative; transition: background .15s; }
+.devsw .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 1px var(--stroke); transition: left .15s; }
+.devsw[aria-pressed="true"] { background: var(--accent2-soft); }
+.devsw[aria-pressed="true"] .track { background: var(--rose); }
+.devsw[aria-pressed="true"] .track::after { left: 12px; }
+
+main { flex: 1; padding-block: 6px 104px; display: flex; flex-direction: column; gap: 16px; }
+.screen-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.screen-title h2 { font-family: var(--font-hand); font-weight: 700; font-size: 28px; line-height: 1.1; position: relative; padding-bottom: 6px; }
+.screen-title h2::after { content: ""; position: absolute; left: 0; right: 8%; bottom: 0; height: 6px; background: var(--surface); border-radius: 3px; opacity: .8; z-index: -1; }
+.screen-title .muted { font-size: 13px; }
+.screen-title h2 { z-index: 0; }
+
+/* 탭바 */
+.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 520px; z-index: 6; background: var(--surface); border-top: 1.5px solid var(--stroke); display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+.tabbar button { border: 0; background: none; padding: 9px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px; color: var(--muted); cursor: pointer; position: relative; }
+.tabbar button svg { width: 24px; height: 24px; }
+.tabbar button[aria-current="true"] { color: var(--rose); font-weight: 700; }
+.tabbar button[aria-current="true"] svg { fill: var(--heart-soft); stroke: var(--rose); }
+.badge { position: absolute; top: 4px; left: calc(50% + 8px); min-width: 17px; height: 17px; padding: 0 5px; border-radius: 9px; background: var(--heart); color: #FFFFFF; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+
+/* 공통 */
+.btn { border: 1.5px solid var(--rose); border-radius: 999px; padding: 10px 18px; font-weight: 700; cursor: pointer; background: var(--rose); color: var(--accent-ink); transition: transform .08s; }
+.btn:active { transform: translateY(1px); }
+.btn.alt { background: var(--surface); color: var(--rose); }
+.btn.line { background: transparent; color: var(--rose); }
+.btn.heart { background: var(--heart); border-color: var(--heart); color: #FFFFFF; }
+.btn.sm { padding: 6px 13px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.panel { background: var(--surface); border-radius: 18px; padding: 16px; box-shadow: var(--shadow); }
+.notice { border-radius: 14px; padding: 12px 14px; font-size: 14px; background: var(--paper); border: 1.5px dashed var(--stroke); }
+.notice.warn { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); }
+.notice.ok { background: var(--heart-soft); border-color: var(--heart); }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 2px 10px; border-radius: 999px; background: var(--chip); }
+.chip.hit { background: var(--accent-soft); color: var(--rose); font-weight: 700; box-shadow: inset 0 0 0 1px var(--stroke); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tgl { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+.tgl.on { background: var(--rose); border-color: var(--rose); color: var(--accent-ink); font-weight: 700; }
+.tgl.lv1 { background: var(--accent-soft); color: var(--rose); border-color: var(--stroke); }
+.tgl.lv3 { background: var(--heart); border-color: var(--heart); color: #FFFFFF; }
+.tgl .stars { font-size: 11px; letter-spacing: -1px; }
+.grade { display: inline-block; font-family: var(--font-hand); font-weight: 700; font-size: 15px; padding: 0 10px; border-radius: 999px; background: var(--lilac); color: var(--ink); }
+.grade.top { background: var(--heart-soft); color: var(--heart); }
+
+/* 손그림 장식 */
+.doodle { stroke: var(--stroke); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.doodle .fillh { fill: var(--heart-soft); }
+.doodle .fillm { fill: var(--lilac); }
+
+/* 사진 */
+.ph { position: relative; overflow: hidden; background: var(--paper); display: grid; place-items: center; }
+.ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ph .ini { font-family: var(--font-logo); color: var(--surface); -webkit-text-stroke: 1.5px var(--stroke); paint-order: stroke fill; }
+.ph.noimg { background: repeating-linear-gradient(-45deg, var(--paper) 0 10px, var(--strip) 10px 20px); }
+.av { width: 46px; height: 46px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1.5px var(--stroke); }
+.av .ini { font-size: 20px; -webkit-text-stroke-width: 1px; }
+
+/* 인증 화면 */
+.auth { padding-block: 28px 40px; display: flex; flex-direction: column; gap: 18px; }
+.auth-brand { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.auth-brand .logo { align-items: center; }
+.auth-brand .logo small { font-size: 11px; }
+.auth-brand .logo span { font-size: 96px; line-height: 1.05; -webkit-text-stroke-width: 2.4px; text-shadow: 0 4px 0 var(--stroke); }
+.auth-brand p { margin: 0; font-family: var(--font-hand); font-size: 22px; font-weight: 700; color: var(--rose); }
+.auth-art { width: 100%; max-width: 320px; background: var(--surface); border-radius: 6px; box-shadow: var(--shadow); overflow: hidden; }
+.auth-art svg { display: block; width: 100%; height: auto; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-radius: 999px; padding: 4px; box-shadow: var(--shadow); }
+.seg button { border: 0; background: none; padding: 9px; border-radius: 999px; cursor: pointer; color: var(--muted); font-weight: 700; }
+.seg button[aria-selected="true"] { background: var(--rose); color: var(--accent-ink); }
+form.f { display: flex; flex-direction: column; gap: 14px; }
+.auth form.f { background: var(--surface); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
+.fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fld > span { font-size: 13px; font-weight: 700; }
+.fld > span small { font-weight: 400; color: var(--muted); }
+.fld input[type=text], .fld input[type=password], .fld input[type=number], .fld input[type=date], .fld select, .fld textarea {
+  width: 100%; border: 1.5px solid var(--line); background: var(--paper); border-radius: 12px; padding: 10px 12px; }
+.fld input:focus, .fld select:focus, .fld textarea:focus { border-color: var(--stroke); outline: none; }
+.fld textarea { resize: vertical; min-height: 70px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.radios { display: flex; gap: 8px; flex-wrap: wrap; }
+.radios label { display: flex; gap: 6px; align-items: center; border: 1.5px solid var(--line); background: var(--paper); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 14px; }
+.radios input { accent-color: var(--stroke); }
+.err { color: var(--bad); font-size: 13px; margin: 0; font-weight: 700; }
+.demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.demo { display: flex; align-items: center; gap: 8px; border: 0; background: var(--surface); border-radius: 14px; padding: 8px 10px; cursor: pointer; text-align: left; min-width: 0; box-shadow: var(--shadow); }
+.demo .av { width: 32px; height: 32px; }
+.demo .av .ini { font-size: 14px; }
+.demo b { font-size: 13px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.demo small { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.photo-pick { display: flex; gap: 14px; align-items: center; }
+.photo-pick .ph { width: 84px; height: 105px; border-radius: 6px; flex: none; box-shadow: 0 0 0 1.5px var(--stroke); }
+.photo-pick .ph .ini { font-size: 34px; }
+.file-btn { position: relative; overflow: hidden; display: inline-block; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+/* 게시물 카드 */
+.card { background: var(--surface); border-radius: 6px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); }
+.card .frame { padding: 14px 14px 0; }
+.card .ph { aspect-ratio: 1 / 1; max-width: 100%; box-shadow: 0 0 0 1.5px var(--stroke); }
+.card .ph .ini { font-size: 96px; }
+.card-body { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+.card-name { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.card-name b { font-family: var(--font-display); font-weight: 400; font-size: 24px; }
+.reasons { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+.reasons li { padding-left: 22px; position: relative; }
+.reasons li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 12px; height: 10px; border: 2px solid var(--heart); border-top: 0; border-right: 0; transform: rotate(-45deg) scale(.8); }
+.post-strip { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--strip); padding: 8px 14px; }
+.post-strip .ico { border: 0; background: none; padding: 4px; cursor: pointer; color: var(--rose); display: grid; place-items: center; border-radius: 8px; }
+.post-strip .ico svg { width: 22px; height: 22px; }
+.post-strip .ico.on svg { fill: var(--heart); stroke: var(--heart); }
+.post-strip .right { display: flex; gap: 2px; align-items: center; }
+.post-strip .dots { color: var(--rose); letter-spacing: 2px; font-weight: 700; padding: 0 4px; }
+.acts { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
+.devline { font-family: var(--font-mono); font-size: 12px; color: var(--mint-deep); background: var(--accent2-soft); border-radius: 8px; padding: 6px 10px; }
+.state { font-size: 14px; font-weight: 700; color: var(--heart); }
+
+.match-banner { border-radius: 18px; padding: 16px; background: var(--surface); box-shadow: var(--shadow); border: 2px solid var(--heart); display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+.match-banner .pair { display: flex; align-items: center; gap: 8px; }
+.match-banner .heart { color: var(--heart); font-size: 20px; }
+.match-banner h3 { font-family: var(--font-hand); font-weight: 700; font-size: 24px; }
+
+/* 목록 */
+.list { display: flex; flex-direction: column; }
+.item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1.5px dashed var(--line); cursor: pointer; min-width: 0; }
+.item:last-child { border-bottom: 0; }
+.item .meta { flex: 1; min-width: 0; }
+.item .meta b { display: block; }
+.item .meta > span { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item .side { font-size: 12px; color: var(--muted); text-align: right; flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.item .unread { background: var(--heart); color: #FFFFFF; border-radius: 9px; min-width: 18px; padding: 0 6px; font-size: 11px; font-weight: 700; text-align: center; }
+.sec h3 { font-family: var(--font-hand); font-weight: 700; font-size: 20px; margin-bottom: 2px; }
+.via { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+.via.auto { background: var(--heart-soft); color: var(--heart); }
+.sigtag { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--rose); white-space: nowrap; }
+.sigtag.warm { background: var(--heart-soft); color: var(--heart); }
+.empty { text-align: center; padding: 26px 12px; color: var(--muted); font-size: 14px; }
+.empty b { display: block; color: var(--ink); font-family: var(--font-hand); font-size: 21px; margin-bottom: 2px; }
+.empty svg { width: 90px; height: auto; margin: 0 auto 8px; display: block; }
+
+/* 시트 (상세, 채팅) */
+.overlay { position: fixed; inset: 0; z-index: 20; display: flex; justify-content: center; align-items: flex-end; }
+.scrim { position: absolute; inset: 0; background: var(--scrim); }
+.sheet { position: relative; width: 100%; max-width: 520px; max-height: calc(100% - 24px - env(safe-area-inset-top, 0px)); background: var(--app); border-radius: 22px 22px 0 0; display: flex; flex-direction: column; overflow: hidden; }
+.sheet.full { height: calc(100% - env(safe-area-inset-top, 0px)); max-height: none; border-radius: 0; }
+.sheet-head { display: flex; align-items: center; gap: 10px; padding-block: 10px; background: var(--surface); border-bottom: 1.5px solid var(--stroke); }
+.sheet-head b { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 400; font-size: 19px; }
+.icon-btn { border: 0; background: none; cursor: pointer; padding: 6px; border-radius: 10px; display: grid; place-items: center; color: var(--rose); }
+.icon-btn svg { width: 22px; height: 22px; }
+.sheet-body { overflow-y: auto; padding-block: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+.detail-frame { background: var(--surface); padding: 14px 14px 0; }
+.detail-ph { aspect-ratio: 4 / 5; max-width: 100%; max-height: 52vh; width: 100%; box-shadow: 0 0 0 1.5px var(--stroke); }
+.detail-ph .ini { font-size: 120px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px 14px; }
+.facts .k { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .04em; }
+.facts .v { font-size: 14px; }
+.sheet-foot { background: var(--surface); padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1.5px dashed var(--line); }
+
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+th, td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font-size: 11px; color: var(--muted); font-weight: 700; }
+td.n, th.n { text-align: right; font-family: var(--font-mono); white-space: nowrap; }
+td.note { color: var(--muted); }
+tr.sum td { font-weight: 700; border-bottom: 0; }
+tr.pen td { color: var(--bad); }
+.sheet-wrap { overflow-x: auto; }
+.formula { font-family: var(--font-mono); font-size: 12px; padding: 8px 10px; background: var(--paper); border-radius: 10px; margin-top: 8px; }
+.devbox { background: var(--surface); border: 1.5px dashed var(--mint-deep); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.devbox h4 { margin: 0; font-size: 13px; color: var(--mint-deep); }
+
+/* 마음 표현 */
+.sig { background: var(--surface); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
+.sig-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.sig-head b { font-family: var(--font-hand); font-size: 20px; }
+.sig-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.sig-opt { border: 1.5px solid var(--stroke); background: var(--surface); color: var(--rose); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.sig-opt.on { background: var(--heart); border-color: var(--heart); color: #FFFFFF; }
+.sig-opt.soft { border-color: var(--line); color: var(--muted); }
+.sig-opt.soft.on { background: var(--muted); border-color: var(--muted); color: var(--surface); }
+.sig-their { font-size: 14px; }
+.sig-their b { color: var(--heart); }
+.sig-both { font-family: var(--font-hand); font-size: 19px; font-weight: 700; color: var(--heart); background: var(--heart-soft); border-radius: 12px; padding: 6px 12px; }
+.metsw { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.metsw input { accent-color: var(--heart); }
+.sig-mini { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* 채팅 */
+.log { flex: 1; overflow-y: auto; padding-block: 14px; display: flex; flex-direction: column; gap: 6px; }
+.msg { max-width: 78%; padding: 8px 13px; border-radius: 18px; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.me { align-self: flex-end; background: var(--rose); color: var(--accent-ink); border-bottom-right-radius: 4px; }
+.msg.them { align-self: flex-start; background: var(--surface); border: 1.5px solid var(--stroke); border-bottom-left-radius: 4px; }
+.msg-img { padding: 0; border: 0; background: none; cursor: zoom-in; max-width: 62%; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1.5px var(--stroke); }
+.msg-img.me { align-self: flex-end; }
+.msg-img.them { align-self: flex-start; }
+.msg-img img { display: block; width: 100%; height: auto; max-height: 300px; object-fit: cover; }
+.msg-img .loading { display: block; width: 160px; height: 120px; background: var(--paper); font-size: 12px; color: var(--muted); padding-top: 50px; text-align: center; }
+.msg-time { font-size: 11px; color: var(--muted); }
+.msg-time.me { align-self: flex-end; }
+.msg-sys { align-self: center; font-size: 12px; color: var(--heart); background: var(--heart-soft); border-radius: 999px; padding: 3px 12px; font-weight: 700; }
+.daysep { align-self: center; font-size: 12px; color: var(--muted); padding: 6px 0; font-family: var(--font-hand); }
+.composer { display: flex; gap: 8px; align-items: center; background: var(--surface); border-top: 1.5px solid var(--stroke); padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px)); }
+.composer input[type=text] { flex: 1; min-width: 0; border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 14px; background: var(--paper); }
+.attach { position: relative; flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--stroke); color: var(--rose); display: grid; place-items: center; cursor: pointer; background: var(--surface); }
+.attach svg { width: 20px; height: 20px; }
+.attach input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.lightbox { position: fixed; inset: 0; z-index: 40; background: rgba(15, 12, 30, .86); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+
+/* 내 정보 */
+.sliders { display: flex; flex-direction: column; gap: 6px; }
+.sl { display: grid; grid-template-columns: 84px minmax(0, 1fr) 54px; gap: 10px; align-items: center; font-size: 13px; }
+.sl input { width: 100%; accent-color: var(--stroke); }
+.sl .v { text-align: right; font-size: 12px; color: var(--muted); }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.check input { accent-color: var(--heart); }
+.status { font-size: 12px; color: var(--muted); text-align: center; font-family: var(--font-hand); font-size: 15px; }
+
+.picker { display: flex; flex-direction: column; gap: 10px; border: 1.5px dashed var(--stroke); border-radius: 16px; padding: 12px; background: var(--paper); }
+.picked { display: flex; flex-direction: column; gap: 6px; padding-bottom: 10px; border-bottom: 1.5px dashed var(--line); }
+.pk-k { font-size: 12px; font-weight: 700; color: var(--muted); }
+.cats { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.cat { flex: none; border: 1.5px solid var(--stroke); background: var(--surface); color: var(--rose); border-radius: 999px; padding: 4px 12px; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-weight: 700; }
+.cat.on { background: var(--rose); border-color: var(--rose); color: var(--accent-ink); }
+.cat .cnt { background: var(--heart); color: #FFFFFF; border-radius: 8px; font-size: 11px; padding: 0 6px; }
+.picker .hint { margin: 0; font-size: 12px; color: var(--muted); }
+.picker .hint b { color: var(--ink); }
+
+.search { position: relative; display: flex; align-items: center; }
+.search input { width: 100%; border: 1.5px solid var(--stroke); background: var(--surface); border-radius: 999px; padding: 11px 42px 11px 40px; }
+.search::before { content: ""; position: absolute; left: 15px; width: 13px; height: 13px; border: 2px solid var(--stroke); border-radius: 50%; top: 50%; transform: translateY(-62%); }
+.search::after { content: ""; position: absolute; left: 27px; top: 50%; width: 6px; height: 2px; background: var(--stroke); transform: translateY(5px) rotate(45deg); border-radius: 2px; }
+.search input::-webkit-search-cancel-button { display: none; }
+.search .icon-btn { position: absolute; right: 4px; }
+.search .icon-btn svg { width: 18px; height: 18px; }
+.search-head { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.near { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 2px; flex-wrap: wrap; }
+.near-bar { width: 70px; height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; flex: none; }
+.near-bar i { display: block; height: 100%; background: var(--stroke); }
+.map { display: flex; flex-direction: column; gap: 8px; }
+.map-head { display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
+.map-head b { font-family: var(--font-hand); font-size: 21px; }
+.map-wrap { overflow-x: auto; }
+.map svg { width: 100%; max-width: 100%; height: auto; display: block; background: var(--paper); border-radius: 12px; }
+.m-dot { fill: var(--surface); stroke: var(--muted); stroke-width: 1; }
+.m-top { fill: var(--heart-soft); stroke: var(--rose); stroke-width: 1.8; }
+.m-me { fill: var(--surface); stroke: var(--stroke); stroke-width: 2.5; }
+.m-q { fill: var(--heart); }
+.m-line { stroke: var(--stroke); stroke-width: 1.4; stroke-dasharray: 3 4; stroke-linecap: round; }
+.m-lab { font-size: 11px; fill: var(--ink); font-family: var(--font-body); }
+.m-lab.q { fill: var(--heart); font-weight: 700; }
+.m-lab.me { font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.lg { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.lg.m-q { background: var(--heart); } .lg.m-top { background: var(--heart-soft); border: 1.5px solid var(--rose); } .lg.m-me { background: var(--surface); border: 2px solid var(--stroke); } .lg.m-dot { background: var(--surface); border: 1px solid var(--muted); }
+.axes { display: grid; grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1fr); gap: 4px 8px; align-items: center; font-size: 12px; }
+.ax-b { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; }
+.ax-b i { display: block; height: 100%; }
+.ax-b.q i { background: var(--heart); } .ax-b.p i { background: var(--stroke); }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 30; background: var(--ink); color: var(--surface); padding: 10px 18px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet.enter { animation: up .22s ease-out; }
+  @keyframes up { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+@media (max-width: 380px) { .row2 { grid-template-columns: 1fr; } }
+</style>
+
+<div id="app"></div>
+
+<script>
+/*__ENGINE__*/
+</script>
+
+<script>
+const BASE = /*__DATA__*/null;
+const E = createEngine(BASE.cfg);
+
+// ---------------- 상수 ----------------
+const KO = {
+  no: "비흡연", yes: "흡연", none: "안 마심", sometimes: "가끔", often: "자주",
+  christian: "기독교", catholic: "천주교", buddhist: "불교",
+  morning: "아침형", night: "저녁형", frequent: "자주", occasional: "가끔", home: "집에서", out: "밖에서",
+  has: "키우는 중", likes: "좋아함", dislikes: "안 좋아함",
+  serious: "새로운 시작", casual: "데이트", friend: "동네친구",
+  positive: "긍정적", neutral: "중립", negative: "부정적",
+  saver: "절약형", balanced: "균형형", spender: "소비형",
+  short: "짧은 머리", medium: "단발", long: "장발", double: "유쌍", single: "무쌍",
+  casual_style: "캐주얼", dandy: "댄디", street: "스트릿", minimal: "미니멀",
+};
+const STYLE_KO = { casual: "캐주얼", dandy: "댄디", street: "스트릿", minimal: "미니멀" };
+const RELIGION_KO = { none: "무교", christian: "기독교", catholic: "천주교", buddhist: "불교" };
+const SMOKE_KO = { no: "비흡연", sometimes: "가끔", yes: "흡연" };
+const OPTS = {
+  purpose: ["friend", "casual", "serious"],
+  marriage_view: ["positive", "neutral", "negative"],
+  contact_style: ["frequent", "occasional"],
+  chronotype: ["morning", "night"],
+  weekend: ["out", "home"],
+  drinking: ["none", "sometimes", "often"],
+  smoking: ["no", "sometimes", "yes"],
+  pet: ["has", "likes", "dislikes"],
+  spending: ["saver", "balanced", "spender"],
+  religion: ["none", "christian", "catholic", "buddhist"],
+};
+const FIELD_KO = { purpose: "만남 목적", marriage_view: "결혼관", contact_style: "연락 빈도", chronotype: "활동 시간", weekend: "주말", drinking: "음주", smoking: "흡연", pet: "반려동물", spending: "소비 성향", religion: "종교" };
+const optLabel = (f, v) => f === "religion" ? RELIGION_KO[v] : f === "smoking" ? SMOKE_KO[v] : (KO[v] ?? v);
+const REGIONS = [
+  ["서울 강서구", 37.5509, 126.8495], ["서울 양천구", 37.5170, 126.8665], ["서울 마포구", 37.5663, 126.9019],
+  ["서울 영등포구", 37.5264, 126.8963], ["서울 서대문구", 37.5791, 126.9368], ["서울 은평구", 37.6027, 126.9291],
+  ["서울 종로구", 37.5735, 126.9790], ["서울 용산구", 37.5326, 126.9905], ["서울 동작구", 37.5124, 126.9393],
+  ["서울 관악구", 37.4784, 126.9516], ["서울 성동구", 37.5634, 127.0369], ["서울 광진구", 37.5385, 127.0823],
+  ["서울 강남구", 37.5172, 127.0473], ["서울 송파구", 37.5145, 127.1059], ["서울 노원구", 37.6542, 127.0568],
+  ["경기 고양시", 37.6584, 126.8320], ["경기 성남시 분당구", 37.3826, 127.1189], ["경기 수원시", 37.2636, 127.0286],
+  ["인천 연수구", 37.4100, 126.6783],
+];
+const CATS = BASE.cfg.categories;
+const CAT_NAMES = Object.keys(CATS);
+const ALL_TAGS = Object.values(CATS).flat();
+const MAX_TOP = BASE.cfg.max_top_level;
+const STARS = { 1: "★", 2: "★★", 3: "★★★" };
+const REC_LIMIT = 3;
+// 마음 표현: 만나기 전 / 실제로 만난 뒤
+const SIG = { like: "좋아요", interest: "관심 있어요", meet: "만나보고 싶어요", again: "한 번 더 만나볼래요", fun: "즐거웠어요", pass: "인연이 아닌 것 같아요" };
+const SIG_PRE = ["like", "interest", "meet"], SIG_POST = ["again", "fun", "pass"];
+// 검색용 동의어 사전 (표준 태그 ← 다르게 부르는 말)
+const SYN = {
+  "등산": ["산타기", "산행", "하이킹", "트레킹"], "러닝": ["달리기", "조깅", "마라톤", "뛰기"], "산책": ["걷기", "한강"],
+  "카페": ["카페투어", "커피"], "헬스": ["웨이트", "피트니스", "헬스장"], "독서": ["책읽기", "북클럽", "책"],
+  "야구": ["야구장", "직관"], "축구": ["풋살"], "농구": ["농구장"], "영화": ["영화관", "시네마"], "넷플릭스": ["ott", "넷플"],
+  "게임": ["게이밍", "피시방", "pc방"], "애니": ["애니메이션", "만화"], "맛집": ["맛집탐방", "먹방", "미식"],
+  "맥주": ["수제맥주", "펍"], "와인": ["와인바"], "음악": ["노래", "플레이리스트"], "공연": ["콘서트", "뮤지컬", "페스티벌"],
+  "고양이": ["냥이", "집사"], "강아지": ["댕댕이", "반려견"], "사진": ["카메라", "출사"], "여행": ["해외여행", "국내여행"],
+  "요리": ["쿠킹", "집밥"], "수영": ["수영장"], "힙합": ["랩", "쇼미"], "캠핑": ["글램핑", "차박"], "드라마": ["정주행"],
+  "클라이밍": ["볼더링"], "자전거": ["라이딩", "따릉이"], "보드게임": ["보드게임카페"], "베이킹": ["빵", "디저트"],
+};
+// 검색어 → 태그 찾기. 띄어쓰기를 지우고 포함 여부로 봐서 "주말엔 산타기 해요"도 등산으로 잡아요
+function parseQuery(q) {
+  const flat = q.toLowerCase().replace(/\s+/g, "");
+  const tags = new Set(), cats = new Set(), via = {};
+  for (const t of ALL_TAGS) {
+    if (flat.includes(t.toLowerCase())) { tags.add(t); via[t] = t; continue; }
+    const hit = (SYN[t] || []).find(w => flat.includes(w));
+    if (hit) { tags.add(t); via[t] = hit; }
+  }
+  for (const c of CAT_NAMES) for (const part of c.split("·")) if (flat.includes(part)) cats.add(c);
+  if (flat.includes("운동")) cats.add("운동");
+  return { tags: [...tags], cats: [...cats], via };
+}
+// 검색어를 좌표로 바꾸고, 공개한 사람들 중 좌표가 가까운 순으로 찾기
+function queryVec(tags, cats) {
+  const v = E.vecOfTags(tags);
+  for (const c of cats) {
+    const cv = E.vecOfTags(CATS[c]);
+    cv.forEach((x, i) => { v[i] += x / CATS[c].length; });
+  }
+  return v;
+}
+function searchPeople(me, q) {
+  const w = world(), { tags, cats, via } = parseQuery(q);
+  if (!tags.length && !cats.length) return { tags, cats, via, results: [], pool: [] };
+  const qv = queryVec(tags, cats);
+  const recIds = Object.fromEntries(w.lists[me.id].recs.map(r => [r.id, r]));
+  const pool = w.list.filter(o => o.id !== me.id && o.searchable && o.has_photo && me.preference.gender.includes(o.gender));
+  const results = pool.map(o => {
+    const exact = o.interests.filter(t => tags.includes(t) || cats.includes(E.CAT_OF[t]));
+    return { o, exact, cos: E.cosine(qv, E.personVec(o)), rec: recIds[o.id] || null };
+  }).filter(r => r.cos >= 0.75 || r.exact.length)
+    .sort((a, b) => b.cos - a.cos || b.exact.length - a.exact.length);
+  return { tags, cats, via, qv, results, pool };
+}
+const LEVEL_KO = { 1: "가끔 해요", 2: "좋아해요", 3: "진짜 좋아해요" };
+const PRESETS = {
+  "기본": { ...E.W0 },
+  "관심사 중심": { ...E.W0, interests: 40, appearance: 5 },
+  "생활 패턴 중심": { ...E.W0, interests: 10, contact_style: 20, chronotype: 12, weekend: 12, drinking: 10 },
+  "가까운 사람": { ...E.W0, distance: 30 },
+  "외모 취향 중심": { ...E.W0, appearance: 30 },
+};
+const DEFAULT_SETTINGS = Object.freeze({ weights: { ...E.W0 }, tags: [], related: false });
+const LOGO = `<div class="logo"><small>DUL · 둘</small><span>둘</span></div>`;
+// 직접 그린 손그림 일러스트 (커피잔 건배 + 하트 + 말풍선)
+const ART = `<svg viewBox="0 0 320 210" role="img" aria-label="두 잔이 건배하는 손그림">
+  <g class="doodle">
+    <path class="fillh" d="M160 44c-5-9-19-6-17 4 2 10 17 17 17 17s15-7 17-17c2-10-12-13-17-4z"/>
+    <g transform="rotate(-14 112 140)"><path class="fillm" d="M82 108h58v38a20 20 0 0 1-20 20h-18a20 20 0 0 1-20-20z"/><path d="M140 118c15 0 15 24 0 24"/><path d="M96 96c-4-6 4-10 0-16M112 96c-4-6 4-10 0-16"/></g>
+    <g transform="rotate(14 208 140)"><path class="fillh" d="M180 108h58v38a20 20 0 0 1-20 20h-18a20 20 0 0 1-20-20z"/><path d="M180 118c-15 0-15 24 0 24"/><path d="M208 96c-4-6 4-10 0-16M224 96c-4-6 4-10 0-16"/></g>
+    <path d="M154 102l6-8 6 8M146 96l-4-8M174 96l4-8"/>
+    <path d="M44 52l0 14M37 59l14 0M276 74l0 12M270 80l12 0M262 150l0 10M257 155l10 0"/>
+    <path d="M222 34h62a10 10 0 0 1 10 10v20a10 10 0 0 1-10 10h-44l-12 10 2-10h-8a10 10 0 0 1-10-10v-20a10 10 0 0 1 10-10z"/>
+    <path d="M60 182c40 6 160 6 200 0" stroke-dasharray="2 7"/>
+  </g>
+  <text x="253" y="60" text-anchor="middle" style="font-family:var(--font-hand);font-size:17px;font-weight:700;fill:var(--rose)">안녕!</text>
+</svg>`;
+const EMPTY_ART = `<svg viewBox="0 0 120 80" aria-hidden="true"><g class="doodle"><path class="fillh" d="M60 22c-6-11-22-7-20 5 2 11 20 20 20 20s18-9 20-20c2-12-14-16-20-5z"/><path d="M26 64c22 6 46 6 68 0" stroke-dasharray="2 6"/><path d="M18 20v8M14 24h8M100 36v8M96 40h8"/></g></svg>`;
+const ICON = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  match: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><circle cx="16" cy="10" r="2.6"/><path d="M3.5 19c.6-3 3-4.6 5.5-4.6s4.9 1.6 5.5 4.6M14.5 14.6c2.6-.4 4.9.9 5.6 4"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z"/></svg>',
+  me: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  bubble: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c4.8 0 8 3 8 6.8s-3.2 6.8-8 6.8c-1 0-2-.1-2.9-.4L5 19l1.2-3.4C4.8 14.4 4 12.7 4 10.8 4 7 7.2 4 12 4z"/></svg>',
+  share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6"/></svg>',
+  clip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><circle cx="9" cy="10.5" r="1.8"/><path d="M20.5 16l-5-5-7.5 7.5"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+};
+
+// ---------------- 상태 ----------------
+const S = {
+  db: null, mode: "connecting", canWrite: true, usersLoaded: false,
+  users: {}, likes: {}, chats: {}, imgs: {}, signals: {}, lightbox: null, sigOpen: false,
+  uid: null, tab: "home", authTab: "login", detail: null, chat: null,
+  dev: false, passed: {}, toast: null, signup: { tags: [], lv: {}, photo: null }, draft: null, read: {},
+  pickCat: { su: CAT_NAMES[0], me: CAT_NAMES[0], f: CAT_NAMES[0] }, q: "",
+  authError: "",
+};
+// ---------------- Firebase (배포판에서만 켜짐) ----------------
+const FB = () => (window.firebase && window.firebase.apps && window.firebase.apps.length) ? window.firebase : null;
+const emailOf = id => `${id}@dul-app.kr`;
+function authErr(e) {
+  const c = e && e.code || "";
+  if (c.includes("email-already-in-use")) return "이미 있는 아이디예요.";
+  if (c.includes("weak-password")) return "비밀번호는 6자 이상이어야 해요.";
+  if (c.includes("invalid-credential") || c.includes("wrong-password") || c.includes("user-not-found") || c.includes("invalid-login")) return "아이디 또는 비밀번호가 맞지 않아요.";
+  if (c.includes("too-many-requests")) return "시도가 너무 많아요. 잠시 뒤 다시 해주세요.";
+  if (c.includes("network")) return "인터넷 연결을 확인해주세요.";
+  return "로그인 서버와 연결하지 못했어요. 잠시 뒤 다시 해주세요.";
+}
+// 회원 목록을 처음 받아올 때까지 기다리기 (최대 5초)
+function usersReady() {
+  return new Promise(res => { const t0 = Date.now(); (function poll() { if (S.usersLoaded || Date.now() - t0 > 5000) res(); else setTimeout(poll, 100); })(); });
+}
+async function ensureAnon() {
+  if (!S.fb) return;
+  const a = S.fb.auth();
+  if (!a.currentUser) await a.signInAnonymously();
+}
+const ls = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+S.uid = ls.get("gm-uid", null);
+S.dev = ls.get("gm-dev", false);
+S.read = ls.get("gm-read", {});
+
+// ---------------- 데이터 합치기 ----------------
+function calcAge(bd) {
+  const [y, m, d] = bd.split("-").map(Number), now = new Date();
+  return now.getFullYear() - y - ((now.getMonth() + 1 < m || (now.getMonth() + 1 === m && now.getDate() < d)) ? 1 : 0);
+}
+function merge(base, doc) {
+  const p = { ...base, ...(doc?.profile || {}), ...(doc?.edits || {}) };
+  p.photo = doc?.photo || null;
+  p.has_photo = !!(base.has_photo || p.photo);
+  if (p.birth_date) p.age = calcAge(p.birth_date);
+  return p;
+}
+function allProfiles() {
+  const out = BASE.profiles.map(b => merge(b, S.users[b.id]));
+  for (const [id, u] of Object.entries(S.users)) if (u.custom && u.profile) out.push(merge({ ...u.profile, id, has_photo: false }, u));
+  return out;
+}
+const settingsOf = uid => S.users[uid]?.settings || DEFAULT_SETTINGS;
+
+let ver = 0, cache = null;
+function world() {
+  if (cache && cache.ver === ver) return cache;
+  const list = allProfiles();
+  const byId = Object.fromEntries(list.map(p => [p.id, p]));
+  cache = { ver, list, byId, ...E.computeAll(list, settingsOf) };
+  return cache;
+}
+// 화면에 보이는 추천만 근거를 자세히 계산해서 붙임 (같은 계산 결과 안에서는 다시 안 함)
+function full(meId, r) {
+  const w = world();
+  if (!r) return r;
+  w.full = w.full || {};
+  const k = meId + ">" + r.id;
+  if (!w.full[k]) w.full[k] = { ...r, ...E.explain(w.ctx, w.byId[meId], w.byId[r.id]) };
+  return w.full[k];
+}
+const pk = (a, b) => [a, b].sort().join("_");
+const liked = (a, b) => !!S.likes[`${a}_${b}`];
+function matchesOf(uid) {
+  const w = world(), out = [];
+  const a = w.auto[uid];
+  if (a) out.push({ id: a.partner, via: "auto" });
+  for (const l of Object.values(S.likes)) {
+    if (l.from === uid && liked(l.to, uid) && !out.some(x => x.id === l.to)) out.push({ id: l.to, via: "likes" });
+  }
+  return out.filter(x => w.byId[x.id]);
+}
+const isMatched = (a, b) => matchesOf(a).some(x => x.id === b);
+
+// ---------------- 저장 ----------------
+const chains = {};
+function queueWrite(path, fn) {
+  const p = (chains[path] || Promise.resolve()).then(fn).catch(e => {
+    if (e && (e.code === "invalid_argument" || e.code === "permission-denied")) { S.canWrite = false; toast("이 화면에서는 저장할 권한이 없어요"); }
+    else if (e && e.code === "quota_exceeded") toast("저장 공간이 가득 찼어요");
+    else toast("저장하지 못했어요. 잠시 뒤 다시 해주세요");
+  });
+  chains[path] = p;
+  return p;
+}
+const plain = o => JSON.parse(JSON.stringify(o));
+// recalc=true: 프로필·설정이 바뀌어 매칭을 다시 계산해야 할 때. 좋아요·메시지는 화면만 다시 그림
+function changed(recalc) { if (recalc) ver++; render(); }
+function saveUser(uid, patch) {
+  S.users[uid] = { ...(S.users[uid] || {}), ...patch };
+  changed(true);
+  if (S.db) { const body = plain(S.users[uid]); queueWrite("users/" + uid, () => S.db.doc("users/" + uid).set(body)); }
+}
+function setLike(from, to, on) {
+  const key = `${from}_${to}`;
+  if (on) S.likes[key] = { from, to, at: Date.now() }; else delete S.likes[key];
+  changed();
+  if (S.db) queueWrite("likes/" + key, () => on ? S.db.doc("likes/" + key).set({ from, to, at: Date.now() }) : S.db.doc("likes/" + key).delete());
+}
+function sendMsg(key, from, text, extra) {
+  const cur = S.chats[key] || { pair: key.split("_"), messages: [] };
+  const next = { pair: cur.pair, messages: [...cur.messages, { from, text, at: Date.now(), ...(extra || {}) }].slice(-300), updatedAt: Date.now() };
+  S.chats[key] = next;
+  markRead(key);
+  changed();
+  if (S.db) { const body = plain(next); queueWrite("chats/" + key, () => S.db.doc("chats/" + key).set(body)); }
+}
+// 사진은 메시지 문서가 커지지 않게 한 장씩 따로 저장하고, 메시지에는 사진 id만 남겨요
+function sendImage(key, from, src) {
+  const id = "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const body = { src, pair: key, from, at: Date.now() };
+  S.imgs[id] = body;
+  if (S.db) queueWrite("chatimgs/" + id, () => S.db.doc("chatimgs/" + id).set(body));
+  sendMsg(key, from, "", { img: id });
+}
+const sigOf = (a, b) => S.signals[`${a}_${b}`] || null;
+function setSignal(from, to, patch) {
+  const key = `${from}_${to}`;
+  const next = { ...(S.signals[key] || {}), from, to, ...patch, at: Date.now() };
+  S.signals[key] = next;
+  changed();
+  if (S.db) { const body = plain(next); queueWrite("signals/" + key, () => S.db.doc("signals/" + key).set(body)); }
+}
+function markRead(key) { S.read[S.uid + ":" + key] = Date.now(); ls.set("gm-read", S.read); }
+function unread(key) {
+  const t = S.read[S.uid + ":" + key] || 0;
+  return (S.chats[key]?.messages || []).filter(m => m.from !== S.uid && m.at > t).length;
+}
+
+async function hash(s) {
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) {
+    let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return "x" + h;
+  }
+}
+function shrinkPhoto(file) { return resizeImage(file, { crop: [360, 450], quality: 0.8 }); }
+function resizeImage(file, opt) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith("image/")) return reject(new Error("type"));
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("read"));
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode"));
+      img.onload = () => {
+        const c = document.createElement("canvas");
+        let W, H;
+        if (opt.crop) { [W, H] = opt.crop; } else { const k = Math.min(1, opt.max / Math.max(img.width, img.height)); W = Math.round(img.width * k); H = Math.round(img.height * k); }
+        c.width = W; c.height = H;
+        const s = Math.max(W / img.width, H / img.height);
+        const w = img.width * s, h = img.height * s;
+        c.getContext("2d").drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+        let url = c.toDataURL("image/jpeg", opt.quality);
+        if (url.length > 230000) url = c.toDataURL("image/jpeg", 0.5);
+        resolve(url);
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+// ---------------- 문장 만들기 ----------------
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const f1 = n => (Math.round(n * 10) / 10).toFixed(1);
+function batchim(word) {
+  const ch = String(word).trim().slice(-1), code = ch.charCodeAt(0);
+  if (code >= 0xAC00 && code <= 0xD7A3) return (code - 0xAC00) % 28 !== 0;
+  return false;
+}
+const josa = (w, a, b) => w + (batchim(w) ? a : b);
+function reasonText(r) {
+  switch (r.key) {
+    case "interests": {
+      const ex = r.hits.filter(h => h.sim === 1).map(h => h.mine);
+      if (ex.length) return `둘 다 ${josa(ex.join(", "), "을", "를")} 좋아해요`;
+      const rel = r.hits.find(h => h.sim >= 0.5);
+      if (rel) return `${josa(rel.mine, "과", "와")} ${rel.theirs}, 취향이 닮았어요`;
+      const cats = [...new Set(r.hits.map(h => E.CAT_OF[h.mine]))];
+      return `둘 다 ${josa(cats.join(", "), "을", "를")} 좋아해요 (${r.hits.map(h => h.theirs).join(" · ")})`;
+    }
+    case "taste": return "관심사는 달라도 즐기는 방식이 비슷해요";
+    case "marriage_view": return "결혼에 대한 생각이 같아요";
+    case "drinking": return r.value === "none" ? "둘 다 술을 안 마셔요" : r.value === "often" ? "둘 다 술자리를 좋아해요" : "술자리 취향이 비슷해요";
+    case "spending": return "돈 쓰는 스타일이 비슷해요";
+    case "contact_style": return r.value === "frequent" ? "둘 다 연락을 자주 하는 편이에요" : "연락은 가끔, 생각이 같아요";
+    case "chronotype": return `둘 다 ${KO[r.value]}이에요`;
+    case "weekend": return r.value === "home" ? "둘 다 주말엔 집에서 쉬는 걸 좋아해요" : "둘 다 주말엔 밖으로 나가요";
+    case "distance": return `가까이 살아요 · 약 ${Math.max(1, Math.round(r.value))}km`;
+    case "appearance": return "내가 좋아하는 스타일이에요";
+  }
+  return "";
+}
+function grade(score) {
+  if (score >= 85) return ["아주 잘 맞아요", true];
+  if (score >= 70) return ["잘 맞아요", true];
+  if (score >= 50) return ["괜찮아요", false];
+  return ["새로운 만남", false];
+}
+function photo(p, cls = "") {
+  return `<div class="ph ${cls}${p.photo ? "" : " noimg"}">${p.photo ? `<img src="${esc(p.photo)}" alt="${esc(p.nickname)} 프로필 사진">` : `<span class="ini" aria-hidden="true">${esc(p.nickname[0])}</span>`}</div>`;
+}
+function timeLabel(at) {
+  const d = new Date(at), now = new Date();
+  const hm = d.toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
+  return d.toDateString() === now.toDateString() ? hm : `${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
+// ---------------- 화면: 로그인 / 회원가입 ----------------
+function authView() {
+  const isLogin = S.authTab === "login";
+  const demo = BASE.profiles.slice(0, 12).map(p => {
+    const m = merge(p, S.users[p.id]);
+    return `<button type="button" class="demo" data-act="demo" data-id="${p.id}">${photo(m, "av")}<span style="min-width:0"><b>${esc(m.nickname)}</b><small>${p.login_id}</small></span></button>`;
+  }).join("");
+  return `<div class="auth pad">
+    <div class="auth-brand">${LOGO}<p>동네친구, 데이트, 새로운 시작</p>
+      <div class="auth-art">${ART}<div class="post-strip"><span class="ico" aria-hidden="true">${ICON.bubble}</span><span class="right"><span class="dots" aria-hidden="true">···</span><span class="ico" aria-hidden="true">${ICON.share}</span><span class="ico on" aria-hidden="true">${ICON.heart}</span></span></div></div></div>
+    <div class="seg" role="tablist">
+      <button role="tab" aria-selected="${isLogin}" data-act="authtab" data-v="login">로그인</button>
+      <button role="tab" aria-selected="${!isLogin}" data-act="authtab" data-v="signup">회원가입</button>
+    </div>
+    ${isLogin ? `
+    <form class="f" id="login-form" autocomplete="off">
+      <label class="fld"><span>아이디</span><input type="text" id="login-id" placeholder="예: user01" autocapitalize="off"></label>
+      <label class="fld"><span>비밀번호</span><input type="password" id="login-pw" placeholder="비밀번호"></label>
+      ${S.authError ? `<p class="err">${esc(S.authError)}</p>` : ""}
+      <button class="btn" type="submit">로그인</button>
+    </form>
+    <div class="notice">${S.fb ? "아래 가상 회원은 누르면 바로 둘러볼 수 있어요." : "데모용 화면이에요. 실제로 쓰는 비밀번호는 넣지 마세요. 아래 가상 회원은 누르면 바로 로그인돼요"} (가상 회원 비밀번호 <span class="num">1234</span>)</div>
+    <div class="demo-grid">${demo}</div>
+    <p class="status">가상 회원은 모두 ${BASE.profiles.length}명이에요 · user001 ~ user${String(BASE.profiles.length).padStart(3, "0")} / 1234</p>` : signupForm()}
+    <p class="status">${statusText()}</p>
+  </div>`;
+}
+function regionOptions(sel) { return REGIONS.map(([r]) => `<option value="${esc(r)}"${r === sel ? " selected" : ""}>${esc(r)}</option>`).join(""); }
+function selectOpts(f, sel) { return OPTS[f].map(v => `<option value="${v}"${v === sel ? " selected" : ""}>${esc(optLabel(f, v))}</option>`).join(""); }
+function signupForm() {
+  const su = S.signup;
+  return `<form class="f" id="signup-form" autocomplete="off">
+    <div class="photo-pick">${su.photo ? `<div class="ph"><img src="${esc(su.photo)}" alt="선택한 사진"></div>` : `<div class="ph"><span class="ini">+</span></div>`}
+      <div><div class="fld"><span>프로필 사진 <small>· 사진이 있어야 추천에 나와요</small></span></div>
+      <label class="btn alt sm file-btn">사진 고르기<input type="file" id="su-photo" accept="image/*"></label></div></div>
+    <div class="row2">
+      <label class="fld"><span>아이디</span><input type="text" id="su-id" placeholder="영문, 숫자 4자 이상" autocapitalize="off"></label>
+      <label class="fld"><span>비밀번호</span><input type="password" id="su-pw" placeholder="${S.fb ? 6 : 4}자 이상"></label>
+    </div>
+    <label class="fld"><span>닉네임</span><input type="text" id="su-nick" maxlength="12" placeholder="다른 사람에게 보이는 이름"></label>
+    <div class="fld"><span>성별</span><div class="radios">
+      <label><input type="radio" name="su-gender" id="su-g-m" value="M" checked> 남성</label>
+      <label><input type="radio" name="su-gender" id="su-g-f" value="F"> 여성</label></div></div>
+    <div class="fld"><span>만나고 싶은 사람</span><div class="radios">
+      <label><input type="radio" name="su-want" id="su-w-o" value="other" checked> 이성</label>
+      <label><input type="radio" name="su-want" id="su-w-s" value="same"> 동성</label>
+      <label><input type="radio" name="su-want" id="su-w-b" value="both"> 상관없음</label></div></div>
+    <div class="row2">
+      <label class="fld"><span>생년월일 <small>· 만 19세 이상</small></span><input type="date" id="su-birth" value="2000-01-01"></label>
+      <label class="fld"><span>사는 곳</span><select id="su-region">${regionOptions("서울 강서구")}</select></label>
+    </div>
+    <div class="row2">
+      <label class="fld"><span>직업</span><input type="text" id="su-job" maxlength="16" placeholder="예: 대학생"></label>
+      <label class="fld"><span>키 (cm)</span><input type="number" id="su-height" min="140" max="210" value="170"></label>
+    </div>
+    <label class="fld"><span>만남 목적</span><select id="su-purpose">${selectOpts("purpose", "serious")}</select></label>
+    <div class="fld"><span>관심사 검색에 내 프로필을 보여줄까요? <small>· 나중에 내 정보에서 바꿀 수 있어요</small></span><div class="radios">
+      <label><input type="radio" name="su-pub" id="su-pub-y" value="1"> 공개</label>
+      <label><input type="radio" name="su-pub" id="su-pub-n" value="0"> 비공개</label></div>
+      <small class="muted" style="font-size:12px">공개하면 다른 사람이 "야구"처럼 관심사로 검색했을 때 내가 나와요. 비공개여도 추천과 매칭은 그대로 돼요.</small></div>
+    <div class="fld"><span>관심사 <small>· 1~5개, 얼마나 좋아하는지도 정해요</small></span>${interestPicker("su", su)}</div>
+    ${S.authError ? `<p class="err">${esc(S.authError)}</p>` : ""}
+    <button class="btn" type="submit">가입하고 시작하기</button>
+  </form>`;
+}
+// 관심사 고르기: 분류 탭 → 그 안의 태그. 누를 때마다 ★★ → ★★★ → ★ → 빼기
+function interestPicker(scope, st) {
+  const cur = S.pickCat[scope];
+  const picked = st.tags.length
+    ? st.tags.map(t => `<button type="button" class="tgl on lv${st.lv[t]}" data-act="tag-${scope}" data-tag="${esc(t)}" title="${LEVEL_KO[st.lv[t]]} · 눌러서 바꾸기">${esc(t)} <span class="stars">${STARS[st.lv[t]]}</span></button>`).join("")
+    : `<span class="muted" style="font-size:13px">아래 분류에서 골라주세요</span>`;
+  const cats = CAT_NAMES.map(c => {
+    const n = CATS[c].filter(t => st.tags.includes(t)).length;
+    return `<button type="button" class="cat${c === cur ? " on" : ""}" data-act="pcat" data-scope="${scope}" data-v="${esc(c)}" aria-pressed="${c === cur}">${esc(c)}${n ? `<span class="cnt">${n}</span>` : ""}</button>`;
+  }).join("");
+  const tags = CATS[cur].map(t => {
+    const lv = st.tags.includes(t) ? st.lv[t] : 0;
+    return `<button type="button" class="tgl${lv ? " on lv" + lv : ""}" data-act="tag-${scope}" data-tag="${esc(t)}" aria-pressed="${!!lv}">${esc(t)}${lv ? ` <span class="stars">${STARS[lv]}</span>` : ""}</button>`;
+  }).join("");
+  return `<div class="picker">
+    <div class="picked"><span class="pk-k">고른 관심사 ${st.tags.length}/5</span><div class="chips">${picked}</div></div>
+    <div class="cats">${cats}</div>
+    <div class="chips">${tags}</div>
+    <p class="hint">누를 때마다 <b>★★ 좋아해요</b> → <b>★★★ 진짜 좋아해요</b>(최대 ${MAX_TOP}개) → <b>★ 가끔 해요</b> → 빼기</p></div>`;
+}
+function cycleTag(st, tag) {
+  const lv = st.tags.includes(tag) ? st.lv[tag] : 0;
+  const tops = st.tags.filter(t => st.lv[t] === 3 && t !== tag).length;
+  if (!lv) { if (st.tags.length >= 5) return toast("관심사는 5개까지 고를 수 있어요"); st.tags.push(tag); st.lv[tag] = 2; }
+  else if (lv === 2) st.lv[tag] = tops >= MAX_TOP ? 1 : 3;
+  else if (lv === 3) st.lv[tag] = 1;
+  else { st.tags = st.tags.filter(x => x !== tag); delete st.lv[tag]; }
+  if (lv === 2 && tops >= MAX_TOP) toast(`★★★는 ${MAX_TOP}개까지라서 ★로 바꿨어요`);
+  render();
+}
+const favOf = st => st.tags.find(t => st.lv[t] === 3) || st.tags[0] || null;
+function statusText() {
+  if (S.mode === "db") return S.canWrite ? (S.fb ? "서버에 연결됨 · 가입, 좋아요, 메시지가 저장돼요" : "저장소에 연결됨 · 가입, 좋아요, 메시지가 저장돼요") : "보기 전용 · 이 화면에서는 저장되지 않아요";
+  if (S.mode === "connecting") return "저장소에 연결하는 중…";
+  return "미리보기 모드 · 새로고침하면 가입, 좋아요, 메시지가 사라져요";
+}
+
+// ---------------- 화면: 앱 ----------------
+function shell() {
+  const me = world().byId[S.uid];
+  const unreadTotal = matchesOf(S.uid).reduce((t, m) => t + unread(pk(S.uid, m.id)), 0);
+  const likedMe = Object.values(S.likes).filter(l => l.to === S.uid && !isMatched(S.uid, l.from)).length;
+  const tabs = [["home", "추천", 0], ["match", "매칭", likedMe], ["chat", "채팅", unreadTotal], ["me", "내 정보", 0]];
+  const body = { home: homeView, match: matchView, chat: chatListView, me: meView }[S.tab](me);
+  return `<header class="bar pad">${LOGO}
+      <button class="devsw" data-act="dev" aria-pressed="${S.dev}" title="계산 과정을 보여줘요"><span class="track"></span>개발자 화면</button></header>
+    <main class="pad">${body}</main>
+    <nav class="tabbar" aria-label="메뉴">${tabs.map(([k, l, n]) => `<button data-act="tab" data-v="${k}" aria-current="${S.tab === k}">${ICON[k]}${l}${n ? `<span class="badge">${n}</span>` : ""}</button>`).join("")}</nav>
+    ${S.chat ? chatView(me) : ""}
+    ${S.detail ? detailView(me) : ""}
+    ${S.lightbox ? `<div class="lightbox" data-act="closelb" role="dialog" aria-label="사진 크게 보기"><img src="${esc(S.lightbox)}" alt="크게 본 사진"></div>` : ""}
+    ${S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ""}`;
+}
+
+function homeView(me) {
+  const w = world();
+  const { recs, rejected } = w.lists[me.id];
+  const passed = S.passed[me.id] || [];
+  const shown = recs.filter(r => !passed.includes(r.id)).slice(0, REC_LIMIT);
+  const left = recs.filter(r => !passed.includes(r.id)).length;
+  const auto = w.auto[me.id];
+  let top = "";
+  if (!me.has_photo) top += `<div class="notice warn">프로필 사진이 없어서 다른 사람 추천에 내가 나오지 않아요. <button class="btn sm" data-act="tab" data-v="me">사진 등록하기</button></div>`;
+  if (auto) {
+    const o = w.byId[auto.partner];
+    top += `<div class="match-banner"><div class="pair">${photo(me, "av")}<span class="heart" aria-hidden="true">♥</span>${photo(o, "av")}</div>
+      <h3>${esc(o.nickname)}님과 자동 매칭됐어요</h3>
+      <p class="muted" style="margin:0;font-size:14px">서로가 서로의 1순위 추천이라 바로 연결됐어요.</p>
+      <div class="sig-mini">${SIG_PRE.map(k => { const on = sigOf(me.id, o.id)?.kind === k; return `<button class="sig-opt${on ? " on" : ""}" data-act="sig" data-id="${o.id}" data-k="${k}" aria-pressed="${on}">♥ ${SIG[k]}</button>`; }).join("")}</div>
+      ${sigOf(o.id, me.id)?.kind ? `<div class="sig-their">${esc(o.nickname)}님의 마음 · <b>${SIG[sigOf(o.id, me.id).kind]}</b></div>` : ""}
+      <div style="display:flex;gap:8px"><button class="btn sm" data-act="openchat" data-id="${o.id}">메시지 보내기</button><button class="btn line sm" data-act="open" data-id="${o.id}">프로필 보기</button></div></div>`;
+  }
+  const searchBar = `<form class="search" id="search-form" role="search"><input type="search" id="q" placeholder="관심사로 찾기 · 예: 야구 맛집, 주말엔 산 타요" autocomplete="off" value="${esc(S.q)}" aria-label="관심사로 사람 찾기">${S.q ? `<button type="button" class="icon-btn" data-act="clearq" aria-label="검색 지우기">${ICON.close}</button>` : ""}</form>`;
+  if (S.q.trim()) return searchBar + searchView(me);
+  const cards = shown.length ? shown.map(r => recCard(me, w.byId[r.id], r)).join("") : emptyRecs(recs.length, rejected);
+  return `${searchBar}<div class="screen-title"><h2>오늘의 추천</h2><span class="muted">${shown.length}명${left > shown.length ? ` · 넘기면 다음 사람` : ""}</span></div>
+    ${top}${cards}
+    ${passed.length ? `<button class="btn line sm" data-act="unpass">넘긴 ${passed.length}명 다시 보기</button>` : ""}`;
+}
+function searchView(me) {
+  const { tags, cats, via, qv, results, pool } = searchPeople(me, S.q);
+  if (!tags.length && !cats.length) return `<div class="empty">${EMPTY_ART}<b>맞는 관심사를 못 찾았어요</b>"등산", "카페", "운동"처럼 관심사 이름을 넣어보세요.</div>`;
+  const understood = [...tags.map(t => via[t] !== t ? `${t} (${via[t]})` : t), ...cats.map(c => `${c} 전체`)];
+  const rows = results.slice(0, 8).map(({ o, exact, cos, rec }) => {
+    const tagsHtml = o.interests.map(t => `<span class="chip${exact.includes(t) ? " hit" : ""}">${esc(t)}${E.levelOf(o, t) === 3 ? " ★" : ""}</span>`).join("");
+    const g = rec ? `<span class="grade${grade(rec.score)[1] ? " top" : ""}">${S.dev ? f1(rec.score) + "점" : grade(rec.score)[0]}</span>` : `<span>추천 조건 밖</span>`;
+    return `<div class="item" data-act="open" data-id="${o.id}">${photo(o, "av")}<div class="meta"><b>${esc(o.nickname)} <span class="muted" style="font-weight:400;font-size:13px">${o.age}세 · ${esc(o.region.replace("서울 ", ""))}</span></b>
+      <div class="near"><span class="near-bar"><i style="width:${Math.max(0, Math.round(cos * 100))}%"></i></span><span class="num">${S.dev ? cos.toFixed(3) : "가까움 " + Math.round(cos * 100) + "%"}</span>${exact.length ? "" : `<span class="muted">· 태그는 달라도 취향이 비슷해요</span>`}</div>
+      <div class="chips" style="margin-top:4px">${tagsHtml}</div></div><div class="side">${g}</div></div>`;
+  }).join("");
+  return `<div class="search-head"><span class="muted">검색어를 이렇게 이해했어요</span><div class="chips">${understood.map(x => `<span class="chip hit">${esc(x)}</span>`).join("")}</div></div>
+    ${me.searchable ? "" : `<div class="notice">내 프로필은 검색 비공개예요. 다른 사람 검색에는 내가 나오지 않아요.</div>`}
+    ${pool.length ? tasteMap(me, qv, pool, results.slice(0, 3).map(r => r.o.id)) : ""}
+    <section class="panel">${rows ? `<div class="list">${rows}</div>` : `<div class="empty">${EMPTY_ART}<b>가까운 사람이 없어요</b>다른 관심사로 찾아보세요.</div>`}</section>
+    ${S.dev && results[0] ? axisTable(qv, results[0].o) : ""}
+    <p class="status">검색 공개에 동의한 사람만 나와요 · 좌표가 가까운 순</p>`;
+}
+// 8차원 좌표를 2차원 지도로: 점 사이 거리가 가까울수록 취향이 비슷해요
+function tasteMap(me, qv, pool, topIds) {
+  const people = [me, ...pool];
+  const pr = E.project2D(people.map(E.personVec));
+  const qp = pr.comps.map(u => qv.reduce((s2, x, i) => s2 + (x - pr.mean[i]) * u[i], 0));
+  const all = [...pr.points, qp];
+  const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
+  const W = 340, H = 220, P = 28;
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const sx = x => P + (x - minX) / ((maxX - minX) || 1) * (W - 2 * P);
+  const sy = y => P + (y - minY) / ((maxY - minY) || 1) * (H - 2 * P);
+  const Q = [sx(qp[0]), sy(qp[1])];
+  let lines = "", dots = "", labels = "";
+  people.forEach((o, i) => {
+    const [x, y] = [sx(pr.points[i][0]), sy(pr.points[i][1])];
+    const isMe = i === 0, top = topIds.includes(o.id);
+    if (top) lines += `<line x1="${Q[0].toFixed(1)}" y1="${Q[1].toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="m-line"/>`;
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isMe || top ? 6 : 4}" class="${isMe ? "m-me" : top ? "m-top" : "m-dot"}"/>`;
+    if (isMe || top) labels += `<text x="${(x + 9).toFixed(1)}" y="${(y + 4).toFixed(1)}" class="m-lab${isMe ? " me" : ""}">${esc(isMe ? "나" : o.nickname)}</text>`;
+  });
+  const star = `<path d="M${Q[0]} ${Q[1] - 9} l2.6 5.6 6.1.6-4.6 4.1 1.4 6-5.5-3.2-5.5 3.2 1.4-6-4.6-4.1 6.1-.6z" class="m-q"/><text x="${(Q[0] + 11).toFixed(1)}" y="${(Q[1] + 4).toFixed(1)}" class="m-lab q">검색어</text>`;
+  return `<section class="panel map"><div class="map-head"><b>취향 지도</b><span class="muted">가까울수록 비슷한 취향 · 관심사 8개 축을 2차원으로 펼친 그림</span></div>
+    <div class="map-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="검색어와 가까운 사람들의 취향 지도">${lines}${dots}${star}${labels}</svg></div>
+    <div class="legend"><span><i class="lg m-q"></i>검색어</span><span><i class="lg m-top"></i>가장 가까운 3명</span><span><i class="lg m-me"></i>나</span><span><i class="lg m-dot"></i>공개한 다른 사람</span></div></section>`;
+}
+// 개발자 화면: 검색어와 1위의 좌표를 축별로 비교
+function axisTable(qv, o) {
+  const pv = E.personVec(o);
+  const norm = v => { const m = Math.max(...v) || 1; return v.map(x => x / m); };
+  const a = norm(qv), b = norm(pv);
+  return `<div class="devbox"><h4>개발자 화면 · 좌표 비교 (가장 큰 값을 1로 맞춤)</h4>
+    <div class="axes">${E.AXES.map((ax, i) => `<span class="ax-l">${ax}</span><span class="ax-b q"><i style="width:${Math.round(a[i] * 100)}%"></i></span><span class="ax-b p"><i style="width:${Math.round(b[i] * 100)}%"></i></span>`).join("")}</div>
+    <div class="legend"><span><i class="lg m-q"></i>검색어</span><span><i class="lg m-top"></i>${esc(o.nickname)}</span></div>
+    <div class="formula">코사인 유사도 = (검색어 · 사람) ÷ (|검색어| × |사람|) = ${E.cosine(qv, pv).toFixed(3)}</div></div>`;
+}
+
+function emptyRecs(total, rej) {
+  if (total) return `<div class="empty">${EMPTY_ART}<b>추천을 모두 확인했어요</b>넘긴 사람을 다시 보거나 설정을 바꿔보세요.</div>`;
+  const s = settingsOf(S.uid);
+  const tagN = rej.R7, distN = rej.R4;
+  let tip = "원하는 상대 조건을 조금 넓혀보세요.";
+  if (tagN && s.tags.length) tip = `고른 관심사 태그 때문에 ${tagN}명이 빠졌어요. 태그를 줄여보세요.`;
+  else if (distN) tip = `거리 조건 때문에 ${distN}명이 빠졌어요. 최대 거리를 넓혀보세요.`;
+  return `<div class="empty">${EMPTY_ART}<b>지금은 맞는 사람이 없어요</b>${esc(tip)}<div style="margin-top:12px"><button class="btn sm" data-act="tab" data-v="me">조건 바꾸기</button></div></div>`;
+}
+function actionButtons(me, o, small) {
+  const sm = small ? " sm" : "";
+  if (isMatched(me.id, o.id)) return `<div class="acts" style="grid-template-columns:1fr"><button class="btn${sm}" data-act="openchat" data-id="${o.id}">대화하기</button></div>`;
+  const mine = liked(me.id, o.id);
+  return `<div class="acts"><button class="btn alt${sm}" data-act="pass" data-id="${o.id}">넘기기</button>
+    <button class="btn${mine ? " line" : " heart"}${sm}" data-act="like" data-id="${o.id}" aria-pressed="${mine}">${mine ? "좋아요 보냄 · 취소" : "♥ 좋아요"}</button></div>`;
+}
+function recCard(me, o, r) {
+  r = full(me.id, r);
+  const [g, topg] = grade(r.score);
+  const reasons = r.reasons.slice(0, 3).map(reasonText).filter(Boolean);
+  const common = new Set(r.reasons.find(x => x.key === "interests")?.hits.map(h => h.theirs) || []);
+  const likedMe = liked(o.id, me.id) && !isMatched(me.id, o.id);
+  const mine = liked(me.id, o.id), matched = isMatched(me.id, o.id);
+  return `<article class="card" data-act="open" data-id="${o.id}">
+    <div class="frame">${photo(o)}</div>
+    <div class="card-body">
+      <div class="card-name"><span><b>${esc(o.nickname)}</b> <span class="muted">${o.age}세</span></span><span class="grade${topg ? " top" : ""}">${g}</span></div>
+      <div class="muted" style="font-size:13px;margin-top:-8px">${esc(o.region)} · ${esc(o.job)}</div>
+      ${likedMe ? `<div class="state">♥ ${esc(o.nickname)}님이 나에게 좋아요를 보냈어요</div>` : ""}
+      ${reasons.length ? `<ul class="reasons">${reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      <div class="chips">${o.interests.map(t => `<span class="chip${common.has(t) ? " hit" : ""}">${esc(t)}${E.levelOf(o, t) === 3 ? " ★" : ""}</span>`).join("")}</div>
+      ${S.dev ? `<div class="devline">최종 ${f1(r.score)} = √(내 기준 ${f1(r.ab)} × 상대 기준 ${f1(r.ba)})</div>` : ""}
+      ${matched ? "" : `<div class="acts"><button class="btn alt sm" data-act="pass" data-id="${o.id}">넘기기</button><button class="btn${mine ? " line" : " heart"} sm" data-act="like" data-id="${o.id}" aria-pressed="${mine}">${mine ? "좋아요 보냄 · 취소" : "♥ 좋아요"}</button></div>`}
+    </div>
+    <div class="post-strip">
+      <button class="ico" data-act="${matched ? "openchat" : "open"}" data-id="${o.id}" aria-label="${matched ? "대화하기" : "프로필 보기"}">${ICON.bubble}</button>
+      <span class="right"><span class="dots" aria-hidden="true">···</span>
+        <button class="ico${mine || matched ? " on" : ""}" data-act="${matched ? "openchat" : "like"}" data-id="${o.id}" aria-label="좋아요">${ICON.heart}</button></span>
+    </div></article>`;
+}
+
+function detailView(me) {
+  const w = world(), o = w.byId[S.detail];
+  if (!o) return "";
+  const r = full(me.id, w.lists[me.id].recs.find(x => x.id === o.id));
+  const reasons = r ? r.reasons.map(reasonText).filter(Boolean) : [];
+  const common = new Set(r?.reasons.find(x => x.key === "interests")?.hits.map(h => h.theirs) || []);
+  const facts = [["직업", o.job], ["키", o.height ? `${o.height}cm` : "-"], ["만남 목적", KO[o.purpose]], ["결혼관", KO[o.marriage_view]],
+    ["연락", KO[o.contact_style]], ["활동 시간", KO[o.chronotype]], ["주말", KO[o.weekend]], ["음주", KO[o.drinking]],
+    ["흡연", SMOKE_KO[o.smoking]], ["반려동물", KO[o.pet]], ["MBTI", o.mbti || "-"]];
+  const [g, topg] = r ? grade(r.score) : ["", false];
+  return `<div class="overlay" role="dialog" aria-modal="true" aria-label="${esc(o.nickname)} 프로필">
+    <div class="scrim" data-act="close"></div>
+    <div class="sheet${S.enter ? " enter" : ""}">
+      <div class="sheet-head pad"><b>${esc(o.nickname)}</b><button class="icon-btn" data-act="close" aria-label="닫기">${ICON.close}</button></div>
+      <div class="sheet-body">
+        <div class="detail-frame">${photo(o, "detail-ph")}<div class="post-strip" style="margin:0 -14px"><span class="ico" aria-hidden="true">${ICON.bubble}</span><span class="right"><span class="dots" aria-hidden="true">···</span><span class="ico${liked(me.id, o.id) ? " on" : ""}" aria-hidden="true">${ICON.heart}</span></span></div></div>
+        <div class="pad" style="display:flex;flex-direction:column;gap:14px">
+          <div><h2 style="font-size:26px">${esc(o.nickname)} <span class="muted" style="font-family:var(--font-body);font-size:16px;font-weight:400">${o.age}세</span></h2>
+            <div class="muted" style="font-size:14px">${esc(o.region)}${r ? ` · 약 ${Math.max(1, Math.round(r.distance))}km` : ""}</div></div>
+          ${o.bio ? `<p style="margin:0">${esc(o.bio)}</p>` : ""}
+          ${r ? `<div class="panel" style="display:flex;flex-direction:column;gap:8px"><div><span class="grade${topg ? " top" : ""}">${g}</span></div>
+            ${reasons.length ? `<ul class="reasons">${reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<span class="muted" style="font-size:14px">새로운 취향을 나눌 수 있는 사람이에요</span>`}</div>` : ""}
+          <div><div class="facts"><div style="grid-column:1/-1"><div class="k">관심사</div><div class="chips" style="margin-top:4px">${o.interests.map(t => `<span class="chip${common.has(t) ? " hit" : ""}">${esc(t)} <span class="muted" style="font-size:11px">${LEVEL_KO[E.levelOf(o, t)]}</span></span>`).join("")}</div></div>
+            ${facts.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`).join("")}</div></div>
+          ${isMatched(me.id, o.id) ? signalPanel(me, o, false) : ""}
+          ${S.dev && r ? devSheet(r) : ""}
+          ${!r ? `<div class="notice" style="font-size:13px">내 추천 조건(나이·거리·목적 등) 밖이라 궁합 점수가 없어요. 검색으로 찾은 사람에게도 좋아요는 보낼 수 있어요.</div>` : ""}
+        </div>
+      </div>
+      ${o.id !== me.id ? `<div class="sheet-foot pad">${actionButtons(me, o)}</div>` : ""}
+    </div></div>`;
+}
+function signalPanel(me, o, compact) {
+  const mine = sigOf(me.id, o.id) || {}, theirs = sigOf(o.id, me.id) || {};
+  const met = !!(mine.met || theirs.met);
+  const opts = met ? SIG_POST : SIG_PRE;
+  const both = mine.kind && mine.kind === theirs.kind && ["again", "meet", "interest", "like"].includes(mine.kind);
+  const bothText = { again: "두 분 모두 한 번 더 만나고 싶어해요. 애프터 성사!", meet: "두 분 모두 만나보고 싶어해요. 약속을 잡아보세요!", interest: "서로 관심이 있어요. 대화를 이어가 보세요", like: "서로 좋아요를 눌렀어요" }[mine.kind];
+  const their = theirs.kind ? `${esc(o.nickname)}님의 마음 · <b>${SIG[theirs.kind]}</b>` : `<span class="muted">${esc(o.nickname)}님은 아직 마음을 표현하지 않았어요</span>`;
+  if (compact && !S.sigOpen) return `<div class="sig"><div class="sig-head"><span class="sig-their">${their}</span><button class="btn sm${mine.kind ? " line" : " heart"}" data-act="sigopen">${mine.kind ? "내 마음 · " + SIG[mine.kind] : "마음 표현하기"}</button></div>${both ? `<div class="sig-both">${bothText}</div>` : ""}</div>`;
+  return `<div class="sig">
+    <div class="sig-head"><b>마음 표현하기</b>
+      <label class="metsw"><input type="checkbox" id="met-${o.id}" data-met="${o.id}"${met ? " checked" : ""}> 실제로 만났어요</label></div>
+    <div class="sig-opts">${opts.map(k => `<button type="button" class="sig-opt${k === "pass" ? " soft" : ""}${mine.kind === k ? " on" : ""}" data-act="sig" data-id="${o.id}" data-k="${k}" aria-pressed="${mine.kind === k}">${k === "pass" ? "" : "♥ "}${SIG[k]}</button>`).join("")}</div>
+    <div class="sig-their">${their}</div>
+    ${both ? `<div class="sig-both">${bothText}</div>` : ""}
+    ${compact ? `<button class="btn line sm" style="align-self:flex-start" data-act="sigopen">접기</button>` : ""}
+  </div>`;
+}
+function sigText(m, me, o) {
+  const who = m.from === me.id ? "내가" : `${o.nickname}님이`;
+  return m.sig === "pass" ? `${who} 마음을 전했어요 · 인연이 아닌 것 같아요` : `${who} '${SIG[m.sig]}'를 보냈어요`;
+}
+function devSheet(r) {
+  const rows = r.parts.map(b => `<tr><td>${b.label}</td><td class="n">${Math.round(b.w)}</td><td class="n">${f1(b.pts)}</td><td class="n">${f1(b.ptsB)}</td><td class="note">${esc(b.note)}</td></tr>`).join("");
+  const pa = r.penA.map(x => `<tr class="pen"><td colspan="2">감점 · 내 조건</td><td class="n">${x.pts}</td><td></td><td class="note">${esc(x.text)}</td></tr>`).join("");
+  const pb = r.penB.map(x => `<tr class="pen"><td colspan="2">감점 · 상대 조건</td><td></td><td class="n">${x.pts}</td><td class="note">${esc(x.text)}</td></tr>`).join("");
+  return `<div class="devbox"><h4>개발자 화면 · 점수 계산서</h4><div class="sheet-wrap"><table>
+    <thead><tr><th>항목</th><th class="n">가중치</th><th class="n">내 기준</th><th class="n">상대 기준</th><th>근거</th></tr></thead>
+    <tbody>${rows}${pa}${pb}<tr class="sum"><td>합계</td><td class="n">100</td><td class="n">${f1(r.ab)}</td><td class="n">${f1(r.ba)}</td><td></td></tr></tbody></table></div>
+    <div class="formula">최종 = √(${f1(r.ab)} × ${f1(r.ba)}) = ${f1(r.score)}점</div></div>`;
+}
+
+function personRow(o, sub, side, act = "open") {
+  return `<div class="item" data-act="${act}" data-id="${o.id}">${photo(o, "av")}<div class="meta"><b>${esc(o.nickname)} <span class="muted" style="font-weight:400;font-size:13px">${o.age}세</span></b><span>${sub}</span></div>${side ? `<div class="side">${side}</div>` : ""}</div>`;
+}
+function matchView(me) {
+  const w = world();
+  const ms = matchesOf(me.id);
+  const likedMe = Object.values(S.likes).filter(l => l.to === me.id && !isMatched(me.id, l.from) && w.byId[l.from]);
+  const iLiked = Object.values(S.likes).filter(l => l.from === me.id && !isMatched(me.id, l.to) && w.byId[l.to]);
+  const sec = (title, inner, emptyText) => `<section class="panel sec"><h3>${title}</h3>${inner || `<div class="empty" style="padding:10px">${emptyText}</div>`}</section>`;
+  return `<div class="screen-title"><h2>매칭</h2></div>
+    ${sec(`연결된 사람 · ${ms.length}`, ms.length ? `<div class="list">${ms.map(m => { const th = sigOf(m.id, me.id), mi = sigOf(me.id, m.id);
+      const sub = th?.kind ? `${esc(w.byId[m.id].nickname)}님 · ${SIG[th.kind]}` : esc(w.byId[m.id].region);
+      return personRow(w.byId[m.id], sub,
+      `<span class="via${m.via === "auto" ? " auto" : ""}">${m.via === "auto" ? "자동 매칭" : "서로 좋아요"}</span>${mi?.kind ? `<span class="sigtag${mi.kind === "pass" ? "" : " warm"}">내 마음 · ${SIG[mi.kind]}</span>` : ""}<button class="btn sm" data-act="openchat" data-id="${m.id}">대화</button>`); }).join("")}</div>` : "",
+      "서로 1순위이거나 서로 좋아요를 누르면 여기에 나와요")}
+    ${sec(`나를 좋아한 사람 · ${likedMe.length}`, likedMe.length ? `<div class="list">${likedMe.map(l => personRow(w.byId[l.from], "좋아요를 보냈어요",
+      `<button class="btn sm" data-act="like" data-id="${l.from}">♥ 수락</button>`)).join("")}</div>` : "", "아직 없어요")}
+    ${sec(`내가 좋아요 보낸 사람 · ${iLiked.length}`, iLiked.length ? `<div class="list">${iLiked.map(l => personRow(w.byId[l.to], "상대의 답을 기다리는 중",
+      `<span>${timeLabel(l.at)}</span>`)).join("")}</div>` : "", "추천에서 마음에 드는 사람에게 좋아요를 보내보세요")}`;
+}
+
+function chatListView(me) {
+  const w = world();
+  const ms = matchesOf(me.id).map(m => {
+    const key = pk(me.id, m.id), msgs = S.chats[key]?.messages || [];
+    return { ...m, key, last: msgs[msgs.length - 1], n: unread(key) };
+  }).sort((a, b) => (b.last?.at || 0) - (a.last?.at || 0));
+  return `<div class="screen-title"><h2>채팅</h2></div>
+    <section class="panel">${ms.length ? `<div class="list">${ms.map(m => personRow(w.byId[m.id],
+      m.last ? esc(m.last.sig ? sigText(m.last, me, w.byId[m.id]) : (m.last.from === me.id ? "나: " : "") + (m.last.img ? "사진을 보냈어요" : m.last.text)) : "매칭됐어요. 먼저 인사해보세요",
+      `${m.last ? `<span>${timeLabel(m.last.at)}</span>` : ""}${m.n ? `<span class="unread">${m.n}</span>` : ""}`, "openchat")).join("")}</div>`
+      : `<div class="empty">${EMPTY_ART}<b>아직 대화할 사람이 없어요</b>매칭된 사람과 여기서 메시지를 주고받을 수 있어요.</div>`}</section>`;
+}
+function chatView(me) {
+  const w = world(), o = w.byId[S.chat];
+  if (!o) return "";
+  const key = pk(me.id, o.id), msgs = S.chats[key]?.messages || [];
+  let lastDay = "", log = "";
+  for (const m of msgs) {
+    const day = new Date(m.at).toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
+    if (day !== lastDay) { log += `<div class="daysep">${day}</div>`; lastDay = day; }
+    const mine = m.from === me.id, side = mine ? "me" : "them";
+    const time = `<div class="msg-time ${mine ? "me" : ""}">${new Date(m.at).toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" })}</div>`;
+    if (m.sig) { log += `<div class="msg-sys">${esc(sigText(m, me, o))}</div>`; continue; }
+    if (m.img) {
+      const im = S.imgs[m.img];
+      log += `<button class="msg-img ${side}" data-act="lightbox" data-img="${esc(m.img)}" aria-label="사진 크게 보기">${im ? `<img src="${esc(im.src)}" alt="보낸 사진">` : `<span class="loading">사진 불러오는 중</span>`}</button>${time}`;
+      continue;
+    }
+    log += `<div class="msg ${side}">${esc(m.text)}</div>${time}`;
+  }
+  const base = BASE.profiles.find(p => p.id === o.id);
+  const hint = base ? `${esc(o.nickname)}님은 가상 회원이에요. 답장해보려면 로그아웃한 뒤 <span class="num">${base.login_id}</span> / <span class="num">1234</span>로 로그인하세요.` : "";
+  const ok = isMatched(me.id, o.id);
+  return `<div class="overlay" role="dialog" aria-modal="true" aria-label="${esc(o.nickname)}님과 대화">
+    <div class="scrim" data-act="closechat"></div>
+    <div class="sheet full${S.enter ? " enter" : ""}">
+      <div class="sheet-head pad"><button class="icon-btn" data-act="closechat" aria-label="뒤로">${ICON.back}</button>${photo(o, "av")}<b>${esc(o.nickname)}</b>
+        <button class="btn line sm" data-act="open" data-id="${o.id}">프로필</button></div>
+      ${ok ? `<div class="pad" style="padding-block:10px 0">${signalPanel(me, o, true)}</div>` : ""}
+      <div class="log pad" id="chat-log">${hint ? `<div class="notice" style="font-size:13px">${hint}</div>` : ""}
+        ${log || `<div class="empty">${EMPTY_ART}<b>${esc(o.nickname)}님과 매칭됐어요</b>공통 관심사로 먼저 말을 걸어보세요.</div>`}</div>
+      ${ok ? `<form class="composer pad" id="chat-form"><label class="attach" title="사진 보내기">${ICON.clip}<input type="file" id="chat-photo" accept="image/*" aria-label="사진 보내기"></label><input type="text" id="chat-input" placeholder="메시지 보내기" maxlength="500" autocomplete="off"><button class="btn sm" type="submit">보내기</button></form>`
+        : `<div class="composer pad"><span class="muted" style="font-size:14px">매칭된 사람과만 대화할 수 있어요</span></div>`}
+    </div></div>`;
+}
+
+function meView(me) {
+  if (!S.draft || S.draft.uid !== me.id) S.draft = { uid: me.id, tags: [...me.interests], lv: Object.fromEntries(me.interests.map(t => [t, E.levelOf(me, t)])), hair: [...(me.preference.appearance?.hair || [])], style: [...(me.preference.appearance?.style || [])] };
+  const d = S.draft, s = settingsOf(me.id), pr = me.preference;
+  const sum = E.KEYS.reduce((t, k) => t + s.weights[k], 0) || 1;
+  const activePreset = Object.entries(PRESETS).find(([, w]) => E.KEYS.every(k => w[k] === s.weights[k]))?.[0];
+  const smokeDeal = pr.conditions?.smoking?.importance === 3;
+  const lifestyle = ["purpose", "marriage_view", "contact_style", "chronotype", "weekend", "drinking", "smoking", "pet", "spending", "religion"];
+  const a = me.appearance || {};
+  const tg = (key, v, label, on) => `<button type="button" class="tgl${on ? " on" : ""}" data-act="ap-${key}" data-v="${v}" aria-pressed="${on}">${label}</button>`;
+  return `<div class="screen-title"><h2>내 정보</h2><button class="btn line sm" data-act="logout">로그아웃</button></div>
+    <section class="panel"><div class="photo-pick">${photo(me)}<div style="display:flex;flex-direction:column;gap:8px">
+      <b style="font-family:var(--font-display);font-size:20px">${esc(me.nickname)}</b>
+      <span class="muted" style="font-size:13px">${me.age}세 · ${esc(me.region)}</span>
+      <label class="btn alt sm file-btn">${me.photo ? "사진 바꾸기" : "사진 등록하기"}<input type="file" id="me-photo" accept="image/*"></label></div></div></section>
+
+    <section class="panel"><label class="check" style="justify-content:space-between"><span><b style="display:block">관심사 검색에 공개</b><small class="muted">끄면 다른 사람 검색 결과에 내가 나오지 않아요</small></span>
+      <input type="checkbox" id="me-pub"${me.searchable ? " checked" : ""}></label></section>
+
+    <form class="panel f" id="me-form">
+      <h3 style="font-size:18px">프로필</h3>
+      <label class="fld"><span>자기소개</span><textarea id="me-bio" maxlength="120">${esc(me.bio || "")}</textarea></label>
+      <div class="row2">
+        <label class="fld"><span>직업</span><input type="text" id="me-job" maxlength="16" value="${esc(me.job || "")}"></label>
+        <label class="fld"><span>사는 곳</span><select id="me-region">${regionOptions(me.region)}${REGIONS.some(r => r[0] === me.region) ? "" : `<option selected>${esc(me.region)}</option>`}</select></label>
+      </div>
+      <div class="fld"><span>관심사 <small>· 1~5개, 얼마나 좋아하는지도 정해요</small></span>${interestPicker("me", d)}</div>
+      <div class="row2">${lifestyle.map(f => `<label class="fld"><span>${FIELD_KO[f]}</span><select id="me-${f}">${selectOpts(f, me[f])}</select></label>`).join("")}</div>
+      <h3 style="font-size:18px;margin-top:6px">내 외모</h3>
+      <div class="row2">
+        <label class="fld"><span>머리</span><select id="me-hair">${["short", "medium", "long"].map(v => `<option value="${v}"${a.hair === v ? " selected" : ""}>${KO[v]}</option>`).join("")}</select></label>
+        <label class="fld"><span>쌍꺼풀</span><select id="me-eyelid">${["double", "single"].map(v => `<option value="${v}"${a.eyelid === v ? " selected" : ""}>${KO[v]}</option>`).join("")}</select></label>
+        <label class="fld"><span>안경</span><select id="me-glasses"><option value="0"${!a.glasses ? " selected" : ""}>안 씀</option><option value="1"${a.glasses ? " selected" : ""}>씀</option></select></label>
+        <label class="fld"><span>스타일</span><select id="me-style">${Object.entries(STYLE_KO).map(([v, l]) => `<option value="${v}"${a.style === v ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+      </div>
+      <h3 style="font-size:18px;margin-top:6px">원하는 상대</h3>
+      <div class="row2">
+        <label class="fld"><span>나이 (최소)</span><input type="number" id="me-amin" min="19" max="60" value="${pr.age_min}"></label>
+        <label class="fld"><span>나이 (최대)</span><input type="number" id="me-amax" min="19" max="60" value="${pr.age_max}"></label>
+        <label class="fld"><span>최대 거리 (km)</span><input type="number" id="me-dist" min="1" max="100" value="${pr.max_distance_km}"></label>
+        <label class="fld"><span>거리 중요도</span><select id="me-dimp">${[[1, "멀어도 괜찮아요"], [2, "가까우면 좋아요"], [3, "꼭 지켜야 해요"]].map(([v, l]) => `<option value="${v}"${pr.distance_importance === v ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+      </div>
+      <div class="fld"><span>좋아하는 머리 <small>· 안 고르면 상관없음</small></span><div class="chips">${["short", "medium", "long"].map(v => tg("hair", v, KO[v], d.hair.includes(v))).join("")}</div></div>
+      <div class="fld"><span>좋아하는 스타일</span><div class="chips">${Object.entries(STYLE_KO).map(([v, l]) => tg("style", v, l, d.style.includes(v))).join("")}</div></div>
+      <label class="check"><input type="checkbox" id="me-nosmoke"${smokeDeal ? " checked" : ""}> 흡연자는 만나지 않을래요</label>
+      <button class="btn" type="submit">프로필 저장</button>
+    </form>
+
+    <section class="panel f">
+      <h3 style="font-size:18px">추천 설정</h3>
+      <div class="fld"><span>이 관심사가 있는 사람만 보기 <small>· 안 고르면 모두</small></span>${filterPicker(s)}</div>
+      <label class="check"><input type="checkbox" id="set-related"${s.related ? " checked" : ""}> 비슷한 관심사도 인정 (등산 ≈ 캠핑)</label>
+      <div class="fld"><span>중요하게 보는 것</span><div class="chips">${Object.keys(PRESETS).map(n => `<button type="button" class="tgl${n === activePreset ? " on" : ""}" data-act="preset" data-v="${n}" aria-pressed="${n === activePreset}">${n}</button>`).join("")}</div></div>
+      <div class="sliders">${E.KEYS.map(k => `<label class="sl" for="w-${k}"><span>${E.LABEL[k]}</span><input type="range" id="w-${k}" min="0" max="40" step="1" value="${s.weights[k]}" data-w="${k}"><span class="v" data-wv="${k}">${weightLabel(s.weights[k], sum)}</span></label>`).join("")}</div>
+    </section>
+    <p class="status">${statusText()}</p>`;
+}
+function filterPicker(s) {
+  const cur = S.pickCat.f;
+  const label = v => v.startsWith("cat:") ? `${v.slice(4)} 전체` : v;
+  const picked = s.tags.length ? s.tags.map(v => `<button type="button" class="tgl on" data-act="ftag" data-tag="${esc(v)}">${esc(label(v))} ✕</button>`).join("") : `<span class="muted" style="font-size:13px">모든 관심사</span>`;
+  const cats = CAT_NAMES.map(c => `<button type="button" class="cat${c === cur ? " on" : ""}" data-act="pcat" data-scope="f" data-v="${esc(c)}" aria-pressed="${c === cur}">${esc(c)}</button>`).join("");
+  const whole = "cat:" + cur, wOn = s.tags.includes(whole);
+  const tags = [`<button type="button" class="tgl${wOn ? " on" : ""}" data-act="ftag" data-tag="${esc(whole)}" aria-pressed="${wOn}">${esc(cur)} 전체</button>`]
+    .concat(CATS[cur].map(t => { const on = s.tags.includes(t); return `<button type="button" class="tgl${on ? " on" : ""}" data-act="ftag" data-tag="${esc(t)}" aria-pressed="${on}">${esc(t)}</button>`; })).join("");
+  return `<div class="picker"><div class="picked"><span class="pk-k">고른 조건</span><div class="chips">${picked}</div></div><div class="cats">${cats}</div><div class="chips">${tags}</div></div>`;
+}
+function weightLabel(v, sum) {
+  const p = v * 100 / sum;
+  if (S.dev) return `${Math.round(p)}점`;
+  return p < 4 ? "안 봐요" : p < 9 ? "조금" : p < 16 ? "보통" : "많이";
+}
+
+// ---------------- 렌더 ----------------
+let lastScreen = "";
+function render() {
+  const app = document.getElementById("app");
+  const authed = S.uid && world().byId[S.uid];
+  const screen = authed ? `${S.tab}|${S.detail}|${S.chat}` : `auth|${S.authTab}`;
+  const keep = {};
+  if (screen === lastScreen) for (const el of app.querySelectorAll("input[id], textarea[id], select[id]")) {
+    if (el.type === "file") continue;
+    keep[el.id] = el.type === "checkbox" || el.type === "radio" ? { c: el.checked } : { v: el.value };
+  }
+  const active = document.activeElement?.id;
+  const log = document.getElementById("chat-log");
+  const nearBottom = log ? log.scrollHeight - log.scrollTop - log.clientHeight < 80 : true;
+  const scrollY = window.scrollY;
+  S.enter = screen !== lastScreen;
+  app.innerHTML = authed ? shell() : authView();
+  if (screen === lastScreen) {
+    for (const [id, st] of Object.entries(keep)) { const el = document.getElementById(id); if (!el) continue; if ("c" in st) el.checked = st.c; else el.value = st.v; }
+    window.scrollTo(0, scrollY);
+  }
+  if (active) { const el = document.getElementById(active); if (el && el.type !== "file") el.focus({ preventScroll: true }); }
+  const nlog = document.getElementById("chat-log");
+  if (nlog && (nearBottom || screen !== lastScreen)) nlog.scrollTop = nlog.scrollHeight;
+  if (S.chat && authed) markRead(pk(S.uid, S.chat));
+  lastScreen = screen;
+}
+let toastTimer;
+function toast(t) { S.toast = t; render(); clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; render(); }, 2600); }
+
+function login(uid) {
+  S.uid = uid; ls.set("gm-uid", uid);
+  S.tab = "home"; S.detail = null; S.chat = null; S.draft = null; S.authError = ""; S.sigOpen = false; S.q = "";
+  render();
+  window.scrollTo(0, 0);
+}
+
+// ---------------- 이벤트 ----------------
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-act]");
+  if (!t) return;
+  const act = t.dataset.act, id = t.dataset.id;
+  const me = S.uid;
+  switch (act) {
+    case "authtab": S.authTab = t.dataset.v; S.authError = ""; render(); break;
+    case "demo":
+      if (S.fb && S.fb.auth().currentUser && !S.fb.auth().currentUser.isAnonymous) { ls.set("gm-uid", id); S.fb.auth().signOut().finally(() => location.reload()); break; }
+      login(id); break;
+    case "tab": S.tab = t.dataset.v; S.detail = null; S.chat = null; S.sigOpen = false; if (t.dataset.v === "home" && S.tab === "home") S.q = S.q; render(); window.scrollTo(0, 0); break;
+    case "dev": S.dev = !S.dev; ls.set("gm-dev", S.dev); render(); break;
+    case "open": S.detail = id; render(); break;
+    case "close": S.detail = null; render(); break;
+    case "openchat": S.chat = id; S.detail = null; S.sigOpen = false; render(); break;
+    case "closechat": S.chat = null; S.sigOpen = false; render(); break;
+    case "lightbox": { const im = S.imgs[t.dataset.img]; if (im) { S.lightbox = im.src; render(); } break; }
+    case "closelb": S.lightbox = null; render(); break;
+    case "sigopen": S.sigOpen = !S.sigOpen; render(); break;
+    case "sig": {
+      if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
+      if (!isMatched(me, id)) return toast("매칭된 사람에게만 마음을 표현할 수 있어요");
+      const k = t.dataset.k, cur = sigOf(me, id)?.kind;
+      if (cur === k) { setSignal(me, id, { kind: null }); toast("마음 표현을 취소했어요"); break; }
+      setSignal(me, id, { kind: k });
+      sendMsg(pk(me, id), me, "", { sig: k });
+      const th = sigOf(id, me)?.kind;
+      toast(th === k && (k === "again" || k === "meet") ? (k === "again" ? "애프터 성사! 다시 만나요" : "두 분 모두 만나보고 싶어해요") : `'${SIG[k]}'를 전했어요`);
+      break;
+    }
+    case "like": {
+      if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
+      const on = !liked(me, id);
+      setLike(me, id, on);
+      if (on && liked(id, me)) toast(`${world().byId[id].nickname}님과 서로 좋아요! 매칭됐어요`);
+      else if (on) toast("좋아요를 보냈어요");
+      break;
+    }
+    case "pass": { (S.passed[me] = S.passed[me] || []).push(id); S.detail = null; render(); break; }
+    case "unpass": S.passed[me] = []; render(); break;
+    case "clearq": S.q = ""; render(); document.getElementById("q")?.focus(); break;
+    case "logout": if (S.fb && S.fb.auth().currentUser && !S.fb.auth().currentUser.isAnonymous) { ls.set("gm-uid", null); S.fb.auth().signOut().finally(() => location.reload()); break; }
+      S.uid = null; ls.set("gm-uid", null); S.authTab = "login"; S.draft = null; render(); window.scrollTo(0, 0); break;
+    case "tag-su": case "tag-me": cycleTag(act === "tag-su" ? S.signup : S.draft, t.dataset.tag); break;
+    case "pcat": S.pickCat[t.dataset.scope] = t.dataset.v; render(); break;
+    case "ap-hair": case "ap-style": {
+      const k = act.slice(3), v = t.dataset.v, arr = S.draft[k];
+      S.draft[k] = arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
+      render(); break;
+    }
+    case "ftag": {
+      const s = settingsOf(me), tag = t.dataset.tag;
+      const tags = s.tags.includes(tag) ? s.tags.filter(x => x !== tag) : [...s.tags, tag];
+      saveUser(me, { settings: { ...plain(s), tags } }); break;
+    }
+    case "preset": saveUser(me, { settings: { ...plain(settingsOf(me)), weights: { ...PRESETS[t.dataset.v] } } }); break;
+  }
+});
+
+document.addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.id === "login-form") {
+    const idv = document.getElementById("login-id").value.trim().toLowerCase(), pw = document.getElementById("login-pw").value;
+    const base = BASE.profiles.find(p => p.login_id === idv);
+    if (base) { if (pw === "1234") return login(base.id); S.authError = "비밀번호가 맞지 않아요. 가상 회원의 비밀번호는 1234예요."; return render(); }
+    if (S.fb) {
+      try {
+        const cred = await S.fb.auth().signInWithEmailAndPassword(emailOf(idv), pw);
+        await usersReady();
+        if (!S.users[cred.user.uid]) {   // 데이터 초기화로 프로필이 없어진 옛 계정
+          try { await cred.user.delete(); } catch (e2) { await S.fb.auth().signOut().catch(() => {}); }
+          await ensureAnon();
+          S.authTab = "signup"; S.authError = "서비스가 새로 시작돼서 예전 계정 정보가 없어졌어요. 같은 아이디로 다시 가입해주세요.";
+          return render();
+        }
+        return login(cred.user.uid);
+      } catch (e) { S.authError = authErr(e); return render(); }
+    }
+    const found = Object.entries(S.users).find(([, u]) => u.custom && u.login_id === idv);
+    if (!found) { S.authError = S.mode === "connecting" ? "저장소에 연결하는 중이에요. 잠시 뒤 다시 해주세요." : "없는 아이디예요."; return render(); }
+    if (found[1].pw_hash !== await hash(idv + ":" + pw)) { S.authError = "비밀번호가 맞지 않아요."; return render(); }
+    return login(found[0]);
+  }
+  if (f.id === "signup-form") {
+    if (!S.canWrite) { S.authError = "보기 전용 화면이라 가입할 수 없어요."; return render(); }
+    const v = id => document.getElementById(id).value.trim();
+    const loginId = v("su-id").toLowerCase(), pw = document.getElementById("su-pw").value, nick = v("su-nick");
+    const gender = document.getElementById("su-g-f").checked ? "F" : "M";
+    const wantSel = document.getElementById("su-w-s").checked ? "same" : document.getElementById("su-w-b").checked ? "both" : "other";
+    const birth = v("su-birth"), region = REGIONS.find(r => r[0] === v("su-region")), su = S.signup;
+    let err = "";
+    if (!/^[a-z0-9]{4,16}$/.test(loginId)) err = "아이디는 영문 소문자와 숫자 4~16자로 만들어주세요.";
+    else if (BASE.profiles.some(p => p.login_id === loginId) || Object.values(S.users).some(u => u.custom && u.login_id === loginId)) err = "이미 있는 아이디예요.";
+    else if (pw.length < (S.fb ? 6 : 4)) err = `비밀번호는 ${S.fb ? 6 : 4}자 이상이어야 해요.`;
+    else if (!nick) err = "닉네임을 입력해주세요.";
+    else if (!birth || calcAge(birth) < 19) err = "만 19세 이상만 가입할 수 있어요.";
+    else if (!su.tags.length) err = "관심사를 1개 이상 골라주세요.";
+    else if (!document.getElementById("su-pub-y").checked && !document.getElementById("su-pub-n").checked) err = "검색 공개 여부를 골라주세요.";
+    if (err) { S.authError = err; return render(); }
+    const age = calcAge(birth), other = gender === "M" ? "F" : "M";
+    let uid = "n" + Date.now().toString(36);
+    if (S.fb) {
+      try { const cred = await S.fb.auth().createUserWithEmailAndPassword(emailOf(loginId), pw); uid = cred.user.uid; }
+      catch (e) {
+        let reused = false;
+        if (String(e && e.code).includes("email-already-in-use")) {
+          try {
+            const cred = await S.fb.auth().signInWithEmailAndPassword(emailOf(loginId), pw);
+            await usersReady();
+            if (!S.users[cred.user.uid]) { uid = cred.user.uid; reused = true; }
+            else { await S.fb.auth().signOut(); await ensureAnon(); }
+          } catch (e2) { /* 다른 사람 아이디 */ }
+        }
+        if (!reused) { S.authError = authErr(e); return render(); }
+      }
+    }
+    const profile = {
+      nickname: nick, gender, birth_date: birth, region: region[0], lat: region[1], lng: region[2],
+      job: v("su-job") || "비공개", height: +v("su-height") || null, bio: "", interests: [...su.tags], interest_level: { ...su.lv }, favorite_tag: favOf(su), mbti: "",
+      smoking: "no", drinking: "sometimes", religion: "none", chronotype: "night", contact_style: "frequent", weekend: "out", pet: "likes",
+      purpose: v("su-purpose"), marriage_view: "neutral", spending: "balanced", searchable: document.getElementById("su-pub-y").checked,
+      appearance: { hair: "medium", eyelid: "double", glasses: false, style: "casual" },
+      preference: { gender: wantSel === "same" ? [gender] : wantSel === "both" ? ["M", "F"] : [other], age_min: Math.max(19, age - 4), age_max: age + 4,
+        max_distance_km: 15, distance_importance: 2, conditions: {}, appearance: {} },
+    };
+    saveUser(uid, { custom: true, login_id: loginId, ...(S.fb ? {} : { pw_hash: await hash(loginId + ":" + pw) }), profile, photo: su.photo, created: Date.now() });
+    S.signup = { tags: [], lv: {}, photo: null };
+    login(uid);
+    S.tab = "me"; render();
+    toast("가입했어요. 생활 패턴을 채우면 추천이 더 정확해져요");
+    return;
+  }
+  if (f.id === "me-form") {
+    if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
+    const me = world().byId[S.uid], d = S.draft;
+    if (!d.tags.length) return toast("관심사를 1개 이상 골라주세요");
+    const g = id => document.getElementById(id).value;
+    const amin = Math.max(19, +g("me-amin") || 19), amax = Math.max(amin, +g("me-amax") || amin);
+    const region = REGIONS.find(r => r[0] === g("me-region"));
+    const conditions = { ...(me.preference.conditions || {}) };
+    if (document.getElementById("me-nosmoke").checked) conditions.smoking = { value: "no", importance: 3 };
+    else if (conditions.smoking?.importance === 3) delete conditions.smoking;
+    const app = {};
+    if (d.hair.length) app.hair = d.hair;
+    if (d.style.length) app.style = d.style;
+    const edits = {
+      bio: g("me-bio").trim(), job: g("me-job").trim() || me.job, interests: [...d.tags], interest_level: { ...d.lv }, favorite_tag: favOf(d),
+      ...(region ? { region: region[0], lat: region[1], lng: region[2] } : {}),
+      ...Object.fromEntries(["purpose", "marriage_view", "contact_style", "chronotype", "weekend", "drinking", "smoking", "pet", "spending", "religion"].map(k => [k, g("me-" + k)])),
+      appearance: { hair: g("me-hair"), eyelid: g("me-eyelid"), glasses: g("me-glasses") === "1", style: g("me-style") },
+      preference: { ...me.preference, age_min: amin, age_max: amax, max_distance_km: Math.max(1, +g("me-dist") || 10), distance_importance: +g("me-dimp"), conditions, appearance: app },
+    };
+    saveUser(S.uid, { edits: { ...(S.users[S.uid]?.edits || {}), ...edits } });
+    toast("프로필을 저장했어요");
+    return;
+  }
+  if (f.id === "search-form") { S.q = document.getElementById("q").value; document.getElementById("q").blur(); render(); return; }
+  if (f.id === "chat-form") {
+    const inp = document.getElementById("chat-input"), text = inp.value.trim();
+    if (!text) return;
+    if (!S.canWrite) return toast("보기 전용이라 보낼 수 없어요");
+    inp.value = "";
+    sendMsg(pk(S.uid, S.chat), S.uid, text);
+    document.getElementById("chat-input")?.focus();
+  }
+});
+
+document.addEventListener("change", async e => {
+  const el = e.target;
+  if (el.id === "chat-photo") {
+    const file = el.files && el.files[0];
+    if (!file) return;
+    if (!S.canWrite) return toast("보기 전용이라 보낼 수 없어요");
+    try { const url = await resizeImage(file, { max: 720, quality: 0.72 }); sendImage(pk(S.uid, S.chat), S.uid, url); }
+    catch (err) { toast("이미지 파일만 보낼 수 있어요"); }
+    return;
+  }
+  if (el.dataset && el.dataset.met) {
+    if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
+    setSignal(S.uid, el.dataset.met, { met: el.checked });
+    toast(el.checked ? "만난 뒤의 마음을 표현할 수 있어요" : "만나기 전 단계로 돌렸어요");
+    return;
+  }
+  if (el.id === "su-photo" || el.id === "me-photo") {
+    const file = el.files && el.files[0];
+    if (!file) return;
+    try {
+      const url = await shrinkPhoto(file);
+      if (el.id === "su-photo") { S.signup.photo = url; render(); }
+      else { if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요"); saveUser(S.uid, { photo: url }); toast("사진을 등록했어요"); }
+    } catch (err) { toast("이미지 파일만 올릴 수 있어요"); }
+    return;
+  }
+  if (el.id === "me-pub") {
+    if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
+    saveUser(S.uid, { edits: { ...(S.users[S.uid]?.edits || {}), searchable: el.checked } });
+    toast(el.checked ? "검색에 공개했어요" : "검색에서 숨겼어요");
+    return;
+  }
+  if (el.id === "set-related") { saveUser(S.uid, { settings: { ...plain(settingsOf(S.uid)), related: el.checked } }); return; }
+  if (el.dataset.w) {
+    const s = plain(settingsOf(S.uid));
+    s.weights[el.dataset.w] = +el.value;
+    saveUser(S.uid, { settings: s });
+  }
+});
+let qTimer;
+document.addEventListener("input", e => {
+  if (e.target.id === "q") { const v = e.target.value; clearTimeout(qTimer); qTimer = setTimeout(() => { S.q = v; render(); }, 180); return; }
+  const k = e.target.dataset?.w;
+  if (!k) return;
+  const ws = { ...settingsOf(S.uid).weights, [k]: +e.target.value };
+  const sum = E.KEYS.reduce((t, kk) => t + ws[kk], 0) || 1;
+  for (const kk of E.KEYS) { const lab = document.querySelector(`[data-wv="${kk}"]`); if (lab) lab.textContent = weightLabel(ws[kk], sum); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { if (S.lightbox) { S.lightbox = null; render(); } else if (S.chat) { S.chat = null; render(); } else if (S.detail) { S.detail = null; render(); } }
+});
+
+// ---------------- 시작 ----------------
+function subscribe(db, fail) {
+  const watch = (name, apply) => db.collection(name).onSnapshot(snap => {
+    const m = {}; for (const d of snap.docs) m[d.id] = d.data();
+    apply(m); changed(name === "users");
+  }, fail);
+  watch("users", m => { S.users = m; S.usersLoaded = true; });
+  watch("likes", m => { S.likes = m; });
+  watch("chatimgs", m => { S.imgs = { ...S.imgs, ...m }; });
+  watch("signals", m => { S.signals = m; });
+  watch("chats", m => { S.chats = m; });
+}
+async function init() {
+  render();
+  const fb = FB();
+  if (fb) {
+    S.fb = fb;
+    try {
+      const user = await new Promise(res => { const un = fb.auth().onAuthStateChanged(u => { un(); res(u); }); });
+      if (!user) await fb.auth().signInAnonymously();
+      else if (!user.isAnonymous && !S.uid) S.uid = user.uid;
+    } catch (e) { S.mode = "memory"; S.authError = "로그인 서버에 연결하지 못했어요. Firebase 설정을 확인해주세요."; render(); return; }
+    S.db = fb.firestore(); S.mode = "db";
+    subscribe(S.db, e => { console.warn(e); if (e && e.code === "permission-denied") { S.canWrite = false; render(); } });
+    render();
+    usersReady().then(async () => {
+      const u = fb.auth().currentUser;
+      if (u && !u.isAnonymous && !S.users[u.uid]) {   // 초기화 전에 로그인해 둔 옛 계정
+        await fb.auth().signOut().catch(() => {});
+        await ensureAnon().catch(() => {});
+        if (S.uid === u.uid) { S.uid = null; ls.set("gm-uid", null); }
+        render();
+      }
+    });
+    return;
+  }
+  const c = window.claude;
+  if (!c || typeof c.use !== "function") { S.mode = "memory"; render(); return; }
+  let db = null, user = null;
+  try { [db, user] = await Promise.all([c.use("db"), c.use("user")]); } catch (e) {}
+  if (user) { try { if (await user.can("data.write") === false) S.canWrite = false; } catch (e) {} }
+  if (!db) { S.mode = "memory"; render(); return; }
+  S.db = db; S.mode = "db";
+  subscribe(db, e => { if (e && e.code === "revoked") { S.db = null; S.mode = "memory"; render(); } });
+  render();
+}
+init();
+</script>
