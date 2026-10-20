@@ -38,6 +38,22 @@ firebase deploy                 # 사이트 + 보안 규칙 같이 배포
 로그인 계정(Authentication)은 이 명령으로 지워지지 않아요. 예전에 가입한 사람이 로그인하면 앱이 알아서 옛 계정을 정리하고 다시 가입하도록 안내해요.
 계정까지 한 번에 비우고 싶으면 Firebase 콘솔 → Authentication → 사용자에서 전체 선택 후 삭제하세요.
 
+## 3-1. 터미널 없이 GitHub Pages로 열기 (대신 쓸 수 있는 방법)
+
+GitHub 저장소에는 `gh-pages` 브랜치에 사이트 파일이 올라가 있어요.
+
+1. GitHub 저장소 → **Settings → Pages**
+2. **Source: Deploy from a branch**, **Branch: `gh-pages` / `(root)`** → Save
+3. 1~2분 뒤 `https://ysyny1126-bot.github.io/dul/` 에서 열려요.
+   - `.../dul/demo.html` : 가상 회원 500명 시연판 (설정 없이 바로 동작, 새로고침하면 기록이 사라짐)
+   - `.../dul/` : 실제 서비스. 아래 설정을 넣기 전에는 "서버 연결 전" 안내가 나와요.
+
+실제 서비스를 GitHub Pages에서 쓰려면 (Firebase 콘솔만 쓰고 터미널은 필요 없어요):
+1. 위 "1. Firebase 콘솔에서 준비"를 해요 (이메일/비밀번호 로그인, Firestore).
+2. **Firestore → 규칙** 탭에 저장소의 `firestore.rules` 내용을 붙여넣고 게시해요.
+3. **Authentication → 설정 → 승인된 도메인**에 `ysyny1126-bot.github.io` 를 추가해요.
+4. **프로젝트 설정 → 일반 → 내 앱 → 웹 앱(</>) 추가** → 나오는 `firebaseConfig` 값을 `src/firebase-config.js`에 넣고 다시 빌드·푸시해요. (값을 알려주면 Claude가 넣어서 올려줄 수 있어요)
+
 ## 4. 나를 관리자로 지정하기 (처음 한 번)
 
 관리자 화면에서 신고 처리, 이용 정지, 사진 인증 승인, 가입 현황을 볼 수 있어요.

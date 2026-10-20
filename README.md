@@ -94,6 +94,8 @@ python3 build_deploy.py ..        # 배포판 public/index.html (실제 회원 �
 
 ## 배포
 
+**바로 열어보기 (GitHub Pages)**: 저장소 Settings → Pages → Branch `gh-pages` / `(root)` 저장 → `https://ysyny1126-bot.github.io/dul/demo.html` (시연판). 실제 서비스(`/dul/`)는 Firebase 설정을 넣어야 저장돼요.
+
 [docs/DEPLOY.md](docs/DEPLOY.md)를 보세요. 요약하면 Firebase 프로젝트를 만들고 이메일/비밀번호·익명 로그인과 Firestore를 켠 뒤, 이 폴더에서 `firebase use --add` → `./deploy.sh`(Windows는 `deploy.bat`).
 
 ## 처음 배포할 때

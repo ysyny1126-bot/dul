@@ -1,4 +1,9 @@
-"""Firebase Hosting 배포 폴더 만들기: deploy/dul/"""
+"""배포 폴더 만들기 (Firebase Hosting과 GitHub Pages 둘 다)
+
+public/index.html   실제 서비스 (가상 회원 없음, Firebase 필요)
+public/demo.html    시연판 (가상 회원 500명, 설정 없이 바로 동작, 저장은 안 됨)
+public/firebase-config.js   GitHub Pages 등 Firebase 밖에서 열 때 쓰는 설정 (src/firebase-config.js에서 복사)
+"""
 import os, re, shutil, subprocess
 
 # 실제 서비스용: 가상 회원 없이, 가입한 사람끼리만
@@ -24,11 +29,22 @@ body {{ margin: 0; }}
 img {{ max-width: 100%; }}
 [hidden] {{ display: none !important; }}
 </style>
-<!-- Firebase Hosting이 자동으로 넣어주는 SDK와 설정 (API 키를 직접 붙여넣을 필요 없음) -->
-<script src="/__/firebase/{FB_VER}/firebase-app-compat.js"></script>
-<script src="/__/firebase/{FB_VER}/firebase-auth-compat.js"></script>
-<script src="/__/firebase/{FB_VER}/firebase-firestore-compat.js"></script>
-<script src="/__/firebase/init.js"></script>
+<!-- Firebase 연결
+     - Firebase Hosting(*.web.app)에서 열면: Hosting이 자동으로 넣어주는 설정을 씀 (따로 넣을 것 없음)
+     - GitHub Pages 등 다른 곳에서 열면: firebase-config.js에 적힌 설정을 씀 (비어 있으면 서버 없이 미리보기) -->
+<script src="firebase-config.js"></script>
+<script>
+(function () {{
+  var onFb = /\\.(web\\.app|firebaseapp\\.com)$/.test(location.hostname);
+  var cfg = window.DUL_FIREBASE_CONFIG;
+  if (!onFb && !(cfg && cfg.apiKey)) return;
+  var base = onFb ? "/__/firebase/{FB_VER}/" : "https://www.gstatic.com/firebasejs/{FB_VER}/";
+  var tags = ["firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js"]
+    .map(function (f) {{ return '<script src="' + base + f + '"><\\/script>'; }}).join("");
+  tags += onFb ? '<script src="/__/firebase/init.js"><\\/script>' : '<script>firebase.initializeApp(window.DUL_FIREBASE_CONFIG);<\\/script>';
+  document.write(tags);
+}})();
+</script>
 </head>
 <body>
 '''
@@ -38,6 +54,16 @@ if os.path.exists(out_dir + "/public"):
     shutil.rmtree(out_dir + "/public")   # 빌드 결과(public)만 새로 만듦
 os.makedirs(out_dir + "/public")
 open(out_dir + "/public/index.html", "w", encoding="utf-8").write(head + app + "\n</body>\n</html>\n")
+# Firebase 설정 파일 (GitHub Pages용). 원본은 src/firebase-config.js
+shutil.copy("firebase-config.js", out_dir + "/public/firebase-config.js")
+# 시연판: 가상 회원 500명, 서버 없이 동작
+subprocess.run(["python3", "build_app.py"], check=True)
+demo = open("gyeol_app.html", encoding="utf-8").read()
+demo = re.sub(r"^<title>.*?</title>\n", "", demo)
+demo = re.sub(r'^<meta name="claude:viewport-fit-sides"[^>]*>\n', "", demo)
+demo_head = head.split("<!-- Firebase 연결")[0].replace("<title>둘 - 동네친구, 데이트, 새로운 시작</title>", "<title>둘 시연판 - 가상 회원 500명</title>") + "</head>\n<body>\n"
+open(out_dir + "/public/demo.html", "w", encoding="utf-8").write(demo_head + demo + "\n</body>\n</html>\n")
+open(out_dir + "/public/.nojekyll", "w").write("")
 
 open(out_dir + "/firebase.json", "w", encoding="utf-8").write('''{
   "hosting": {
@@ -172,6 +198,22 @@ firebase deploy                 # 사이트 + 보안 규칙 같이 배포
 
 로그인 계정(Authentication)은 이 명령으로 지워지지 않아요. 예전에 가입한 사람이 로그인하면 앱이 알아서 옛 계정을 정리하고 다시 가입하도록 안내해요.
 계정까지 한 번에 비우고 싶으면 Firebase 콘솔 → Authentication → 사용자에서 전체 선택 후 삭제하세요.
+
+## 3-1. 터미널 없이 GitHub Pages로 열기 (대신 쓸 수 있는 방법)
+
+GitHub 저장소에는 `gh-pages` 브랜치에 사이트 파일이 올라가 있어요.
+
+1. GitHub 저장소 → **Settings → Pages**
+2. **Source: Deploy from a branch**, **Branch: `gh-pages` / `(root)`** → Save
+3. 1~2분 뒤 `https://ysyny1126-bot.github.io/dul/` 에서 열려요.
+   - `.../dul/demo.html` : 가상 회원 500명 시연판 (설정 없이 바로 동작, 새로고침하면 기록이 사라짐)
+   - `.../dul/` : 실제 서비스. 아래 설정을 넣기 전에는 "서버 연결 전" 안내가 나와요.
+
+실제 서비스를 GitHub Pages에서 쓰려면 (Firebase 콘솔만 쓰고 터미널은 필요 없어요):
+1. 위 "1. Firebase 콘솔에서 준비"를 해요 (이메일/비밀번호 로그인, Firestore).
+2. **Firestore → 규칙** 탭에 저장소의 `firestore.rules` 내용을 붙여넣고 게시해요.
+3. **Authentication → 설정 → 승인된 도메인**에 `ysyny1126-bot.github.io` 를 추가해요.
+4. **프로젝트 설정 → 일반 → 내 앱 → 웹 앱(</>) 추가** → 나오는 `firebaseConfig` 값을 `src/firebase-config.js`에 넣고 다시 빌드·푸시해요. (값을 알려주면 Claude가 넣어서 올려줄 수 있어요)
 
 ## 4. 나를 관리자로 지정하기 (처음 한 번)
 

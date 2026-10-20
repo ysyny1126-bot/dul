@@ -824,6 +824,7 @@ function authView() {
       ${S.authError ? `<p class="err">${esc(S.authError)}</p>` : ""}
       <button class="btn" type="submit">로그인</button>
     </form>
+    ${REAL && !S.fb ? `<div class="notice warn">아직 서버(Firebase)가 연결되지 않아서 가입·대화가 저장되지 않아요. 가상 회원 500명이 있는 <a href="demo.html" style="color:inherit;font-weight:700">시연판에서 둘러보기 →</a></div>` : ""}
     ${REAL ? `<div class="notice">처음이면 위에서 <b>회원가입</b>을 눌러주세요. 가입한 사람끼리 취향과 생활이 가까운 순서로 추천해드려요.</div>` : `
     <div class="notice">데모용 화면이에요. 실제로 쓰는 비밀번호는 넣지 마세요. 아래 가상 회원은 누르면 바로 로그인돼요 (가상 회원 비밀번호 <span class="num">1234</span>)</div>
     <div class="demo-grid">${demo}</div>
