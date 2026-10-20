@@ -1,8 +1,9 @@
 """Firebase Hosting 배포 폴더 만들기: deploy/dul/"""
 import os, re, shutil, subprocess
 
-subprocess.run(["python3", "build_app.py"], check=True)
-app = open("gyeol_app.html", encoding="utf-8").read()
+# 실제 서비스용: 가상 회원 없이, 가입한 사람끼리만
+subprocess.run(["python3", "build_app.py", "--real"], check=True)
+app = open("dul_real.html", encoding="utf-8").read()
 # 아티팩트 전용 줄(제목, 메타) 빼고 본문만
 app = re.sub(r"^<title>.*?</title>\n", "", app)
 app = re.sub(r'^<meta name="claude:viewport-fit-sides"[^>]*>\n', "", app)
@@ -53,28 +54,49 @@ open(out_dir + "/firebase.json", "w", encoding="utf-8").write('''{
 ''')
 
 open(out_dir + "/firestore.rules", "w", encoding="utf-8").write('''rules_version = '2';
-// 둘 보안 규칙
-// - 로그인(익명 포함)한 사람만 읽고 쓸 수 있어요.
-// - 실제 회원의 프로필은 본인만 고칠 수 있어요. 가상 회원(1~500번)은 시연용이라 누구나 고칠 수 있어요.
+// 둘 보안 규칙 (실제 회원용)
+// - 가입한 회원만 다른 회원의 프로필을 볼 수 있어요 (추천 계산에 필요).
+// - 프로필은 본인만 만들고 고치고 지울 수 있어요.
+// - 좋아요·마음 표현은 보낸 사람과 받은 사람만, 채팅과 사진은 대화하는 두 사람만 볼 수 있어요.
 // - 정해진 컬렉션 말고는 아무것도 못 써요.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function isVirtual(id) { return id.matches('^([1-9]|[1-9][0-9]|[1-4][0-9][0-9]|500)$'); }
+    function member() { return request.auth != null && request.auth.token.firebase.sign_in_provider != 'anonymous'; }
+    function me() { return request.auth.uid; }
 
     match /users/{uid} {
-      allow read: if signedIn();
-      allow write: if signedIn() && (request.auth.uid == uid || isVirtual(uid));
+      allow read: if member();
+      allow create, update: if member() && me() == uid;
+      allow delete: if member() && me() == uid;
     }
-    match /likes/{id}    { allow read, write: if signedIn(); }
-    match /signals/{id}  { allow read, write: if signedIn(); }
-    match /chats/{id}    { allow read, write: if signedIn(); }
-    match /chatimgs/{id} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.src.size() < 400000; }
+    match /likes/{id} {
+      allow read: if member() && (resource.data.from == me() || resource.data.to == me());
+      allow create, update: if member() && request.resource.data.from == me() && id == me() + '_' + request.resource.data.to;
+      allow delete: if member() && resource.data.from == me();
+    }
+    match /signals/{id} {
+      allow read: if member() && (resource.data.from == me() || resource.data.to == me());
+      allow create, update: if member() && request.resource.data.from == me() && id == me() + '_' + request.resource.data.to;
+      allow delete: if member() && resource.data.from == me();
+    }
+    match /chats/{id} {
+      allow read: if member() && me() in resource.data.pair;
+      allow create: if member() && me() in request.resource.data.pair && request.resource.data.pair.size() == 2
+                    && id == request.resource.data.pair[0] + '_' + request.resource.data.pair[1];
+      allow update: if member() && me() in resource.data.pair && request.resource.data.pair == resource.data.pair;
+    }
+    match /chatimgs/{id} {
+      allow read: if member() && me() in resource.data.pair;
+      allow create: if member() && request.resource.data.from == me() && me() in request.resource.data.pair
+                    && request.resource.data.src.size() < 400000;
+    }
   }
 }
 ''')
 
-open(out_dir + "/README.md", "w", encoding="utf-8").write('''# 둘 배포하기 (Firebase Hosting)
+os.makedirs(out_dir + "/docs", exist_ok=True)
+GUIDE = out_dir + "/docs/DEPLOY.md"
+open(GUIDE, "w", encoding="utf-8").write('''# 둘 배포하기 (Firebase Hosting)
 
 이 폴더를 그대로 Firebase에 올리면 `https://<프로젝트ID>.web.app` 주소로 열려요.
 기존 with-6a75a 프로젝트와 섞이지 않도록 **새 프로젝트**를 만들어 쓰세요.
@@ -84,7 +106,6 @@ open(out_dir + "/README.md", "w", encoding="utf-8").write('''# 둘 배포하기 
 1. https://console.firebase.google.com 에서 **프로젝트 추가** → 이름 예: `dul-app`
 2. **빌드 → Authentication → 시작하기 → 로그인 방법**에서 두 개를 켜기
    - 이메일/비밀번호
-   - 익명
 3. **빌드 → Firestore Database → 데이터베이스 만들기**
    - 위치: `asia-northeast3 (서울)`
    - 프로덕션 모드로 시작 (보안 규칙은 배포할 때 같이 올라가요)
@@ -110,7 +131,7 @@ firebase deploy                 # 사이트 + 보안 규칙 같이 배포
 - Windows: `deploy.bat` 더블클릭
 
 지워지는 것: 회원 프로필, 좋아요, 채팅, 사진, 마음 표현 (되돌릴 수 없어요)
-남는 것: 사이트 주소, 보안 규칙, 가상 회원 500명(앱 안에 들어 있어서 그대로예요)
+남는 것: 사이트 주소, 보안 규칙
 
 로그인 계정(Authentication)은 이 명령으로 지워지지 않아요. 예전에 가입한 사람이 로그인하면 앱이 알아서 옛 계정을 정리하고 다시 가입하도록 안내해요.
 계정까지 한 번에 비우고 싶으면 Firebase 콘솔 → Authentication → 사용자에서 전체 선택 후 삭제하세요.
@@ -121,10 +142,13 @@ firebase deploy                 # 사이트 + 보안 규칙 같이 배포
 
 ## 알아둘 점
 
-- 가상 회원 500명(user001~user500 / 1234)은 시연용이라 누구나 들어가서 좋아요·메시지를 보낼 수 있어요. 실제 서비스로 열 때는 가상 회원을 빼세요.
-- 회원가입한 사람은 Firebase 인증 계정이 만들어지고, 비밀번호는 Firebase가 관리해요 (6자 이상).
+- 배포판에는 **가상 회원이 없어요.** 가입한 실제 회원끼리만 추천·매칭돼요. 첫 회원은 "아직 가입한 사람이 적어요" 화면을 보게 돼요.
+  (가상 회원 500명이 들어간 시연판은 `src`에서 `python3 build_app.py`로 만든 `gyeol_app.html`이에요.)
+- 회원가입한 사람은 Firebase 인증 계정이 만들어지고, 비밀번호는 Firebase가 관리해요 (6자 이상). 아이디는 프로필에 저장하지 않아서 다른 회원에게 보이지 않아요.
+- 보안 규칙: 가입한 회원만 다른 회원 프로필을 볼 수 있고, 좋아요·마음 표현은 주고받은 두 사람만, 채팅과 사진은 대화하는 두 사람만 읽을 수 있어요.
+- 회원은 "내 정보 → 회원 탈퇴"로 프로필·사진·보낸 좋아요·마음 표현을 지우고 계정을 없앨 수 있어요.
 - 사진은 줄여서 Firestore에 저장해요. 사람이 많아지면 Cloud Storage로 옮기는 게 좋아요.
-- 지금 보안 규칙은 시연용이라 로그인한 사람이면 좋아요·채팅 문서를 읽을 수 있어요. 실제 서비스 전에는 채팅을 두 사람만 읽게 규칙을 좁혀야 해요.
+- 실제 사람의 개인정보를 받으니, 공개 전에 개인정보 처리방침(무엇을 모으고 어디에 쓰는지, 탈퇴 방법)을 사이트에 적어두세요.
 ''')
 open(out_dir + "/deploy.sh", "w", encoding="utf-8", newline="\n").write('''#!/usr/bin/env bash
 # 둘: 기존 데이터를 모두 지우고 새로 배포 (Mac / Linux)
@@ -154,6 +178,8 @@ call firebase deploy
 echo 끝! 위에 나온 Hosting URL로 들어가 보세요.
 pause
 ''')
+if not os.path.exists(out_dir + "/README.md"):
+    shutil.copy(GUIDE, out_dir + "/README.md")
 print("built", out_dir)
 for root, _, files in os.walk(out_dir):
     for f in files:

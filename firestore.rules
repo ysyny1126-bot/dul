@@ -1,20 +1,39 @@
 rules_version = '2';
-// 둘 보안 규칙
-// - 로그인(익명 포함)한 사람만 읽고 쓸 수 있어요.
-// - 실제 회원의 프로필은 본인만 고칠 수 있어요. 가상 회원(1~500번)은 시연용이라 누구나 고칠 수 있어요.
+// 둘 보안 규칙 (실제 회원용)
+// - 가입한 회원만 다른 회원의 프로필을 볼 수 있어요 (추천 계산에 필요).
+// - 프로필은 본인만 만들고 고치고 지울 수 있어요.
+// - 좋아요·마음 표현은 보낸 사람과 받은 사람만, 채팅과 사진은 대화하는 두 사람만 볼 수 있어요.
 // - 정해진 컬렉션 말고는 아무것도 못 써요.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function isVirtual(id) { return id.matches('^([1-9]|[1-9][0-9]|[1-4][0-9][0-9]|500)$'); }
+    function member() { return request.auth != null && request.auth.token.firebase.sign_in_provider != 'anonymous'; }
+    function me() { return request.auth.uid; }
 
     match /users/{uid} {
-      allow read: if signedIn();
-      allow write: if signedIn() && (request.auth.uid == uid || isVirtual(uid));
+      allow read: if member();
+      allow create, update: if member() && me() == uid;
+      allow delete: if member() && me() == uid;
     }
-    match /likes/{id}    { allow read, write: if signedIn(); }
-    match /signals/{id}  { allow read, write: if signedIn(); }
-    match /chats/{id}    { allow read, write: if signedIn(); }
-    match /chatimgs/{id} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.src.size() < 400000; }
+    match /likes/{id} {
+      allow read: if member() && (resource.data.from == me() || resource.data.to == me());
+      allow create, update: if member() && request.resource.data.from == me() && id == me() + '_' + request.resource.data.to;
+      allow delete: if member() && resource.data.from == me();
+    }
+    match /signals/{id} {
+      allow read: if member() && (resource.data.from == me() || resource.data.to == me());
+      allow create, update: if member() && request.resource.data.from == me() && id == me() + '_' + request.resource.data.to;
+      allow delete: if member() && resource.data.from == me();
+    }
+    match /chats/{id} {
+      allow read: if member() && me() in resource.data.pair;
+      allow create: if member() && me() in request.resource.data.pair && request.resource.data.pair.size() == 2
+                    && id == request.resource.data.pair[0] + '_' + request.resource.data.pair[1];
+      allow update: if member() && me() in resource.data.pair && request.resource.data.pair == resource.data.pair;
+    }
+    match /chatimgs/{id} {
+      allow read: if member() && me() in resource.data.pair;
+      allow create: if member() && request.resource.data.from == me() && me() in request.resource.data.pair
+                    && request.resource.data.src.size() < 400000;
+    }
   }
 }

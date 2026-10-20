@@ -349,6 +349,7 @@ tr.pen td { color: var(--bad); }
 
 <script>
 const BASE = /*__DATA__*/null;
+const REAL = !!BASE.real;   // 실제 서비스 빌드: 가상 회원 없음, 가입한 사람끼리만
 const E = createEngine(BASE.cfg);
 
 // ---------------- 상수 ----------------
@@ -502,14 +503,12 @@ function authErr(e) {
   if (c.includes("network")) return "인터넷 연결을 확인해주세요.";
   return "로그인 서버와 연결하지 못했어요. 잠시 뒤 다시 해주세요.";
 }
-// 회원 목록을 처음 받아올 때까지 기다리기 (최대 5초)
-function usersReady() {
-  return new Promise(res => { const t0 = Date.now(); (function poll() { if (S.usersLoaded || Date.now() - t0 > 5000) res(); else setTimeout(poll, 100); })(); });
-}
-async function ensureAnon() {
-  if (!S.fb) return;
-  const a = S.fb.auth();
-  if (!a.currentUser) await a.signInAnonymously();
+// 내 프로필 문서가 있는지 (있으면 화면에 바로 쓰도록 담아둠)
+async function ownDocExists(uid) {
+  const snap = await S.db.doc("users/" + uid).get();
+  const ok = typeof snap.exists === "function" ? snap.exists() : snap.exists;
+  if (ok) { S.users = { ...S.users, [uid]: snap.data() }; ver++; }
+  return ok;
 }
 const ls = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
@@ -604,7 +603,7 @@ function sendMsg(key, from, text, extra) {
 // 사진은 메시지 문서가 커지지 않게 한 장씩 따로 저장하고, 메시지에는 사진 id만 남겨요
 function sendImage(key, from, src) {
   const id = "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const body = { src, pair: key, from, at: Date.now() };
+  const body = { src, pair: key.split("_"), from, at: Date.now() };
   S.imgs[id] = body;
   if (S.db) queueWrite("chatimgs/" + id, () => S.db.doc("chatimgs/" + id).set(body));
   sendMsg(key, from, "", { img: id });
@@ -707,7 +706,8 @@ function timeLabel(at) {
 // ---------------- 화면: 로그인 / 회원가입 ----------------
 function authView() {
   const isLogin = S.authTab === "login";
-  const demo = BASE.profiles.slice(0, 12).map(p => {
+  if (S.booting) return `<div class="auth pad"><div class="auth-brand">${LOGO}<p>동네친구, 데이트, 새로운 시작</p></div><p class="status">불러오는 중…</p></div>`;
+  const demo = REAL ? "" : BASE.profiles.slice(0, 12).map(p => {
     const m = merge(p, S.users[p.id]);
     return `<button type="button" class="demo" data-act="demo" data-id="${p.id}">${photo(m, "av")}<span style="min-width:0"><b>${esc(m.nickname)}</b><small>${p.login_id}</small></span></button>`;
   }).join("");
@@ -720,18 +720,21 @@ function authView() {
     </div>
     ${isLogin ? `
     <form class="f" id="login-form" autocomplete="off">
-      <label class="fld"><span>아이디</span><input type="text" id="login-id" placeholder="예: user01" autocapitalize="off"></label>
+      <label class="fld"><span>아이디</span><input type="text" id="login-id" placeholder="${REAL ? "가입할 때 만든 아이디" : "예: user001"}" autocapitalize="off"></label>
       <label class="fld"><span>비밀번호</span><input type="password" id="login-pw" placeholder="비밀번호"></label>
       ${S.authError ? `<p class="err">${esc(S.authError)}</p>` : ""}
       <button class="btn" type="submit">로그인</button>
     </form>
-    <div class="notice">${S.fb ? "아래 가상 회원은 누르면 바로 둘러볼 수 있어요." : "데모용 화면이에요. 실제로 쓰는 비밀번호는 넣지 마세요. 아래 가상 회원은 누르면 바로 로그인돼요"} (가상 회원 비밀번호 <span class="num">1234</span>)</div>
+    ${REAL ? `<div class="notice">처음이면 위에서 <b>회원가입</b>을 눌러주세요. 가입한 사람끼리 취향과 생활이 가까운 순서로 추천해드려요.</div>` : `
+    <div class="notice">데모용 화면이에요. 실제로 쓰는 비밀번호는 넣지 마세요. 아래 가상 회원은 누르면 바로 로그인돼요 (가상 회원 비밀번호 <span class="num">1234</span>)</div>
     <div class="demo-grid">${demo}</div>
-    <p class="status">가상 회원은 모두 ${BASE.profiles.length}명이에요 · user001 ~ user${String(BASE.profiles.length).padStart(3, "0")} / 1234</p>` : signupForm()}
+    <p class="status">가상 회원은 모두 ${BASE.profiles.length}명이에요 · user001 ~ user${String(BASE.profiles.length).padStart(3, "0")} / 1234</p>`}` : signupForm()}
     <p class="status">${statusText()}</p>
   </div>`;
 }
 function regionOptions(sel) { return REGIONS.map(([r]) => `<option value="${esc(r)}"${r === sel ? " selected" : ""}>${esc(r)}</option>`).join(""); }
+function selectReq(f) { return `<option value="">골라주세요</option>` + OPTS[f].map(v => `<option value="${v}">${esc(optLabel(f, v))}</option>`).join(""); }
+const LIFE = ["marriage_view", "contact_style", "chronotype", "weekend", "drinking", "smoking", "pet", "spending", "religion"];
 function selectOpts(f, sel) { return OPTS[f].map(v => `<option value="${v}"${v === sel ? " selected" : ""}>${esc(optLabel(f, v))}</option>`).join(""); }
 function signupForm() {
   const su = S.signup;
@@ -760,6 +763,15 @@ function signupForm() {
       <label class="fld"><span>키 (cm)</span><input type="number" id="su-height" min="140" max="210" value="170"></label>
     </div>
     <label class="fld"><span>만남 목적</span><select id="su-purpose">${selectOpts("purpose", "serious")}</select></label>
+    <div class="fld"><span>생활 패턴 <small>· 잘 맞는 사람을 찾는 데 쓰여요</small></span>
+      <div class="row2">${LIFE.map(f => `<label class="fld"><span style="font-weight:400;font-size:12px">${FIELD_KO[f]}</span><select id="su-${f}">${selectReq(f)}</select></label>`).join("")}</div></div>
+    <div class="fld"><span>원하는 상대 <small>· 나이를 비우면 내 나이 ±4살</small></span>
+      <div class="row2">
+        <label class="fld"><span style="font-weight:400;font-size:12px">나이 (최소)</span><input type="number" id="su-amin" min="19" max="60" placeholder="자동"></label>
+        <label class="fld"><span style="font-weight:400;font-size:12px">나이 (최대)</span><input type="number" id="su-amax" min="19" max="60" placeholder="자동"></label>
+        <label class="fld"><span style="font-weight:400;font-size:12px">최대 거리</span><select id="su-dist">${[5, 10, 15, 20, 30, 50].map(k => `<option value="${k}"${k === 15 ? " selected" : ""}>${k}km</option>`).join("")}</select></label>
+        <label class="fld"><span style="font-weight:400;font-size:12px">거리 중요도</span><select id="su-dimp"><option value="1">멀어도 괜찮아요</option><option value="2" selected>가까우면 좋아요</option><option value="3">꼭 지켜야 해요</option></select></label>
+      </div></div>
     <div class="fld"><span>관심사 검색에 내 프로필을 보여줄까요? <small>· 나중에 내 정보에서 바꿀 수 있어요</small></span><div class="radios">
       <label><input type="radio" name="su-pub" id="su-pub-y" value="1"> 공개</label>
       <label><input type="radio" name="su-pub" id="su-pub-n" value="0"> 비공개</label></div>
@@ -906,7 +918,11 @@ function emptyRecs(total, rej) {
   if (total) return `<div class="empty">${EMPTY_ART}<b>추천을 모두 확인했어요</b>넘긴 사람을 다시 보거나 설정을 바꿔보세요.</div>`;
   const s = settingsOf(S.uid);
   const tagN = rej.R7, distN = rej.R4;
+  const others = world().list.filter(p => p.id !== S.uid).length;
+  const anyRej = ["R1", "R2", "R3", "R4", "R5", "R6", "R7"].some(k => rej[k]);
+  if (!anyRej) return `<div class="empty">${EMPTY_ART}<b>아직 가입한 사람이 적어요</b>${others ? "조건이 맞는 회원이 생기면 바로 추천해드릴게요." : "첫 번째 회원이에요! 친구에게 둘을 알려주세요."}</div>`;
   let tip = "원하는 상대 조건을 조금 넓혀보세요.";
+  if (rej.R1 && !tagN && !distN) tip = `사진을 아직 안 올린 회원 ${rej.R1}명은 추천에서 빠져요. 조금만 기다려주세요.`;
   if (tagN && s.tags.length) tip = `고른 관심사 태그 때문에 ${tagN}명이 빠졌어요. 태그를 줄여보세요.`;
   else if (distN) tip = `거리 조건 때문에 ${distN}명이 빠졌어요. 최대 거리를 넓혀보세요.`;
   return `<div class="empty">${EMPTY_ART}<b>지금은 맞는 사람이 없어요</b>${esc(tip)}<div style="margin-top:12px"><button class="btn sm" data-act="tab" data-v="me">조건 바꾸기</button></div></div>`;
@@ -1127,7 +1143,35 @@ function meView(me) {
       <div class="fld"><span>중요하게 보는 것</span><div class="chips">${Object.keys(PRESETS).map(n => `<button type="button" class="tgl${n === activePreset ? " on" : ""}" data-act="preset" data-v="${n}" aria-pressed="${n === activePreset}">${n}</button>`).join("")}</div></div>
       <div class="sliders">${E.KEYS.map(k => `<label class="sl" for="w-${k}"><span>${E.LABEL[k]}</span><input type="range" id="w-${k}" min="0" max="40" step="1" value="${s.weights[k]}" data-w="${k}"><span class="v" data-wv="${k}">${weightLabel(s.weights[k], sum)}</span></label>`).join("")}</div>
     </section>
+    ${S.users[me.id]?.custom ? `<section class="panel f">
+      <h3 style="font-size:18px">회원 탈퇴</h3>
+      ${S.confirmDel ? `<p style="margin:0">정말 탈퇴할까요? 프로필, 사진, 보낸 좋아요와 마음 표현이 지워지고 되돌릴 수 없어요. 주고받은 대화는 상대방 쪽에 남아요.</p>
+        <div style="display:flex;gap:8px"><button class="btn sm" style="background:var(--bad);border-color:var(--bad)" data-act="delacct-yes">탈퇴하기</button><button class="btn line sm" data-act="delacct-no">취소</button></div>`
+      : `<button class="btn line sm" style="align-self:flex-start" data-act="delacct">탈퇴하기</button>`}
+    </section>` : ""}
     <p class="status">${statusText()}</p>`;
+}
+async function deleteAccount() {
+  const uid = S.uid;
+  const mine = col => Object.entries(col).filter(([, d]) => d && d.from === uid).map(([id]) => id);
+  const likeIds = mine(S.likes), sigIds = mine(S.signals);
+  try {
+    if (S.db) {
+      for (const id of likeIds) await S.db.doc("likes/" + id).delete();
+      for (const id of sigIds) await S.db.doc("signals/" + id).delete();
+      await S.db.doc("users/" + uid).delete();
+    }
+    if (S.fb) {
+      try { await S.fb.auth().currentUser.delete(); }
+      catch (e) { await S.fb.auth().signOut().catch(() => {}); }
+    }
+  } catch (e) { toast("탈퇴하지 못했어요. 잠시 뒤 다시 해주세요"); return; }
+  for (const id of likeIds) delete S.likes[id];
+  for (const id of sigIds) delete S.signals[id];
+  delete S.users[uid]; ver++;
+  S.confirmDel = false; S.uid = null; ls.set("gm-uid", null); S.authTab = "login"; S.draft = null; S.tab = "home";
+  if (S.fb) { location.reload(); return; }
+  render(); toast("탈퇴했어요. 그동안 고마웠어요");
 }
 function filterPicker(s) {
   const cur = S.pickCat.f;
@@ -1177,6 +1221,7 @@ function toast(t) { S.toast = t; render(); clearTimeout(toastTimer); toastTimer 
 
 function login(uid) {
   S.uid = uid; ls.set("gm-uid", uid);
+  if (S.fb && !S.subscribed) subscribeFB(uid);
   S.tab = "home"; S.detail = null; S.chat = null; S.draft = null; S.authError = ""; S.sigOpen = false; S.q = "";
   render();
   window.scrollTo(0, 0);
@@ -1190,7 +1235,7 @@ document.addEventListener("click", e => {
   const me = S.uid;
   switch (act) {
     case "authtab": S.authTab = t.dataset.v; S.authError = ""; render(); break;
-    case "demo":
+    case "demo": if (REAL) break;
       if (S.fb && S.fb.auth().currentUser && !S.fb.auth().currentUser.isAnonymous) { ls.set("gm-uid", id); S.fb.auth().signOut().finally(() => location.reload()); break; }
       login(id); break;
     case "tab": S.tab = t.dataset.v; S.detail = null; S.chat = null; S.sigOpen = false; if (t.dataset.v === "home" && S.tab === "home") S.q = S.q; render(); window.scrollTo(0, 0); break;
@@ -1223,6 +1268,9 @@ document.addEventListener("click", e => {
     }
     case "pass": { (S.passed[me] = S.passed[me] || []).push(id); S.detail = null; render(); break; }
     case "unpass": S.passed[me] = []; render(); break;
+    case "delacct": S.confirmDel = true; render(); break;
+    case "delacct-no": S.confirmDel = false; render(); break;
+    case "delacct-yes": deleteAccount(); break;
     case "clearq": S.q = ""; render(); document.getElementById("q")?.focus(); break;
     case "logout": if (S.fb && S.fb.auth().currentUser && !S.fb.auth().currentUser.isAnonymous) { ls.set("gm-uid", null); S.fb.auth().signOut().finally(() => location.reload()); break; }
       S.uid = null; ls.set("gm-uid", null); S.authTab = "login"; S.draft = null; render(); window.scrollTo(0, 0); break;
@@ -1252,10 +1300,8 @@ document.addEventListener("submit", async e => {
     if (S.fb) {
       try {
         const cred = await S.fb.auth().signInWithEmailAndPassword(emailOf(idv), pw);
-        await usersReady();
-        if (!S.users[cred.user.uid]) {   // 데이터 초기화로 프로필이 없어진 옛 계정
+        if (!(await ownDocExists(cred.user.uid))) {   // 데이터 초기화로 프로필이 없어진 옛 계정
           try { await cred.user.delete(); } catch (e2) { await S.fb.auth().signOut().catch(() => {}); }
-          await ensureAnon();
           S.authTab = "signup"; S.authError = "서비스가 새로 시작돼서 예전 계정 정보가 없어졌어요. 같은 아이디로 다시 가입해주세요.";
           return render();
         }
@@ -1281,9 +1327,11 @@ document.addEventListener("submit", async e => {
     else if (!nick) err = "닉네임을 입력해주세요.";
     else if (!birth || calcAge(birth) < 19) err = "만 19세 이상만 가입할 수 있어요.";
     else if (!su.tags.length) err = "관심사를 1개 이상 골라주세요.";
+    else if (LIFE.some(f => !v("su-" + f))) err = "생활 패턴을 모두 골라주세요. (" + LIFE.filter(f => !v("su-" + f)).map(f => FIELD_KO[f]).join(", ") + ")";
     else if (!document.getElementById("su-pub-y").checked && !document.getElementById("su-pub-n").checked) err = "검색 공개 여부를 골라주세요.";
     if (err) { S.authError = err; return render(); }
     const age = calcAge(birth), other = gender === "M" ? "F" : "M";
+    const amin = Math.max(19, +v("su-amin") || age - 4), amax = Math.max(amin, +v("su-amax") || age + 4);
     let uid = "n" + Date.now().toString(36);
     if (S.fb) {
       try { const cred = await S.fb.auth().createUserWithEmailAndPassword(emailOf(loginId), pw); uid = cred.user.uid; }
@@ -1292,9 +1340,8 @@ document.addEventListener("submit", async e => {
         if (String(e && e.code).includes("email-already-in-use")) {
           try {
             const cred = await S.fb.auth().signInWithEmailAndPassword(emailOf(loginId), pw);
-            await usersReady();
-            if (!S.users[cred.user.uid]) { uid = cred.user.uid; reused = true; }
-            else { await S.fb.auth().signOut(); await ensureAnon(); }
+            if (!(await ownDocExists(cred.user.uid))) { uid = cred.user.uid; reused = true; }
+            else await S.fb.auth().signOut();
           } catch (e2) { /* 다른 사람 아이디 */ }
         }
         if (!reused) { S.authError = authErr(e); return render(); }
@@ -1303,17 +1350,18 @@ document.addEventListener("submit", async e => {
     const profile = {
       nickname: nick, gender, birth_date: birth, region: region[0], lat: region[1], lng: region[2],
       job: v("su-job") || "비공개", height: +v("su-height") || null, bio: "", interests: [...su.tags], interest_level: { ...su.lv }, favorite_tag: favOf(su), mbti: "",
-      smoking: "no", drinking: "sometimes", religion: "none", chronotype: "night", contact_style: "frequent", weekend: "out", pet: "likes",
-      purpose: v("su-purpose"), marriage_view: "neutral", spending: "balanced", searchable: document.getElementById("su-pub-y").checked,
+      ...Object.fromEntries(LIFE.map(f => [f, v("su-" + f)])),
+      purpose: v("su-purpose"), searchable: document.getElementById("su-pub-y").checked,
       appearance: { hair: "medium", eyelid: "double", glasses: false, style: "casual" },
-      preference: { gender: wantSel === "same" ? [gender] : wantSel === "both" ? ["M", "F"] : [other], age_min: Math.max(19, age - 4), age_max: age + 4,
-        max_distance_km: 15, distance_importance: 2, conditions: {}, appearance: {} },
+      preference: { gender: wantSel === "same" ? [gender] : wantSel === "both" ? ["M", "F"] : [other], age_min: amin, age_max: amax,
+        max_distance_km: +v("su-dist") || 15, distance_importance: +v("su-dimp") || 2, conditions: {}, appearance: {} },
     };
-    saveUser(uid, { custom: true, login_id: loginId, ...(S.fb ? {} : { pw_hash: await hash(loginId + ":" + pw) }), profile, photo: su.photo, created: Date.now() });
+    saveUser(uid, { custom: true, ...(S.fb ? {} : { login_id: loginId, pw_hash: await hash(loginId + ":" + pw) }), profile, photo: su.photo, created: Date.now() });
+    const hadPhoto = !!su.photo;
     S.signup = { tags: [], lv: {}, photo: null };
     login(uid);
-    S.tab = "me"; render();
-    toast("가입했어요. 생활 패턴을 채우면 추천이 더 정확해져요");
+    if (!hadPhoto) { S.tab = "me"; render(); }
+    toast(hadPhoto ? "가입했어요. 오늘의 추천을 확인해보세요" : "가입했어요. 사진을 올리면 다른 사람 추천에도 나와요");
     return;
   }
   if (f.id === "me-form") {
@@ -1415,30 +1463,43 @@ function subscribe(db, fail) {
   watch("signals", m => { S.signals = m; });
   watch("chats", m => { S.chats = m; });
 }
+// Firebase: 회원 프로필은 전체(추천 계산용), 좋아요·마음 표현·채팅·사진은 내가 당사자인 것만 받아요
+function subscribeFB(uid) {
+  S.subscribed = true;
+  const db = S.db;
+  const fail = e => { console.warn(e); if (e && e.code === "permission-denied") toast("데이터를 불러올 권한이 없어요. 다시 로그인해주세요"); };
+  const parts = {};
+  const merged = name => Object.assign({}, ...Object.entries(parts).filter(([k]) => k.startsWith(name + ":")).map(([, v]) => v));
+  const watch = (key, q, apply, recalc) => q.onSnapshot(snap => {
+    const m = {}; for (const d of snap.docs) m[d.id] = d.data();
+    parts[key] = m; apply(key.split(":")[0]); changed(recalc);
+  }, fail);
+  watch("users:all", db.collection("users"), () => { S.users = merged("users"); S.usersLoaded = true; }, true);
+  watch("likes:from", db.collection("likes").where("from", "==", uid), n => { S.likes = merged(n); });
+  watch("likes:to", db.collection("likes").where("to", "==", uid), n => { S.likes = merged(n); });
+  watch("signals:from", db.collection("signals").where("from", "==", uid), n => { S.signals = merged(n); });
+  watch("signals:to", db.collection("signals").where("to", "==", uid), n => { S.signals = merged(n); });
+  watch("chats:mine", db.collection("chats").where("pair", "array-contains", uid), n => { S.chats = merged(n); });
+  watch("chatimgs:mine", db.collection("chatimgs").where("pair", "array-contains", uid), n => { S.imgs = { ...S.imgs, ...merged(n) }; });
+}
 async function init() {
-  render();
   const fb = FB();
   if (fb) {
-    S.fb = fb;
+    S.fb = fb; S.booting = true; S.mode = "connecting"; render();
+    let user = null;
     try {
-      const user = await new Promise(res => { const un = fb.auth().onAuthStateChanged(u => { un(); res(u); }); });
-      if (!user) await fb.auth().signInAnonymously();
-      else if (!user.isAnonymous && !S.uid) S.uid = user.uid;
-    } catch (e) { S.mode = "memory"; S.authError = "로그인 서버에 연결하지 못했어요. Firebase 설정을 확인해주세요."; render(); return; }
-    S.db = fb.firestore(); S.mode = "db";
-    subscribe(S.db, e => { console.warn(e); if (e && e.code === "permission-denied") { S.canWrite = false; render(); } });
-    render();
-    usersReady().then(async () => {
-      const u = fb.auth().currentUser;
-      if (u && !u.isAnonymous && !S.users[u.uid]) {   // 초기화 전에 로그인해 둔 옛 계정
-        await fb.auth().signOut().catch(() => {});
-        await ensureAnon().catch(() => {});
-        if (S.uid === u.uid) { S.uid = null; ls.set("gm-uid", null); }
-        render();
+      user = await new Promise(res => { const un = fb.auth().onAuthStateChanged(u => { un(); res(u); }); });
+      S.db = fb.firestore(); S.mode = "db";
+      if (user && user.isAnonymous) { await fb.auth().signOut(); user = null; }   // 예전 버전의 익명 세션 정리
+      if (user) {
+        if (await ownDocExists(user.uid)) { S.booting = false; login(user.uid); return; }
+        await fb.auth().signOut().catch(() => {});   // 초기화로 프로필이 없어진 옛 계정
       }
-    });
+    } catch (e) { S.mode = "memory"; S.authError = "로그인 서버에 연결하지 못했어요. 잠시 뒤 다시 들어와주세요."; }
+    S.uid = null; ls.set("gm-uid", null); S.booting = false; render();
     return;
   }
+  render();
   const c = window.claude;
   if (!c || typeof c.use !== "function") { S.mode = "memory"; render(); return; }
   let db = null, user = null;
