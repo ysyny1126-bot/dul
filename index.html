@@ -13,11 +13,22 @@ body { margin: 0; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
 </style>
-<!-- Firebase Hosting이 자동으로 넣어주는 SDK와 설정 (API 키를 직접 붙여넣을 필요 없음) -->
-<script src="/__/firebase/10.12.2/firebase-app-compat.js"></script>
-<script src="/__/firebase/10.12.2/firebase-auth-compat.js"></script>
-<script src="/__/firebase/10.12.2/firebase-firestore-compat.js"></script>
-<script src="/__/firebase/init.js"></script>
+<!-- Firebase 연결
+     - Firebase Hosting(*.web.app)에서 열면: Hosting이 자동으로 넣어주는 설정을 씀 (따로 넣을 것 없음)
+     - GitHub Pages 등 다른 곳에서 열면: firebase-config.js에 적힌 설정을 씀 (비어 있으면 서버 없이 미리보기) -->
+<script src="firebase-config.js"></script>
+<script>
+(function () {
+  var onFb = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
+  var cfg = window.DUL_FIREBASE_CONFIG;
+  if (!onFb && !(cfg && cfg.apiKey)) return;
+  var base = onFb ? "/__/firebase/10.12.2/" : "https://www.gstatic.com/firebasejs/10.12.2/";
+  var tags = ["firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js"]
+    .map(function (f) { return '<script src="' + base + f + '"><\/script>'; }).join("");
+  tags += onFb ? '<script src="/__/firebase/init.js"><\/script>' : '<script>firebase.initializeApp(window.DUL_FIREBASE_CONFIG);<\/script>';
+  document.write(tags);
+})();
+</script>
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1113,6 +1124,7 @@ function authView() {
       ${S.authError ? `<p class="err">${esc(S.authError)}</p>` : ""}
       <button class="btn" type="submit">로그인</button>
     </form>
+    ${REAL && !S.fb ? `<div class="notice warn">아직 서버(Firebase)가 연결되지 않아서 가입·대화가 저장되지 않아요. 가상 회원 500명이 있는 <a href="demo.html" style="color:inherit;font-weight:700">시연판에서 둘러보기 →</a></div>` : ""}
     ${REAL ? `<div class="notice">처음이면 위에서 <b>회원가입</b>을 눌러주세요. 가입한 사람끼리 취향과 생활이 가까운 순서로 추천해드려요.</div>` : `
     <div class="notice">데모용 화면이에요. 실제로 쓰는 비밀번호는 넣지 마세요. 아래 가상 회원은 누르면 바로 로그인돼요 (가상 회원 비밀번호 <span class="num">1234</span>)</div>
     <div class="demo-grid">${demo}</div>
