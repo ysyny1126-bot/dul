@@ -97,6 +97,13 @@ function createEngine(cfg) {
     return Object.fromEntries(KEYS.map(k => [k, (w[k] || 0) * 100 / s]));
   }
 
+  // 실제로 쓰는 가중치: (직접 조절한 값 또는 만남 목적별 기본값) × 마음 표현으로 학습한 배율 → 합계 100
+  function baseWeights(p, s) { return (s && s.weights) || (cfg.purpose_weights && cfg.purpose_weights[p.purpose]) || W0; }
+  function effWeights(p, s) {
+    const b = baseWeights(p, s), L = (s && s.learned) || {};
+    return normWeights(Object.fromEntries(KEYS.map(k => [k, (b[k] || 0) * (L[k] ?? 1)])));
+  }
+
   function filterOne(a, b, d, tagOpt) {
     const pr = a.preference;
     if (!b.nickname || !b.has_photo) return { code: "R1", text: "프로필 미완성 (사진 없음)" };
@@ -170,17 +177,20 @@ function createEngine(cfg) {
   }
 
   // 전체 계산: 사람마다 추천 목록 + 자동 매칭
-  function computeAll(list, settingsOf) {
+  // opts.isBlocked(a, b): 둘 중 한 명이라도 차단했으면 true
+  function computeAll(list, settingsOf, opts) {
+    opts = opts || {};
     const rarity = buildRarity(list);
     const lists = {};
     // 사람별로 한 번만 계산해서 재사용
     const VEC = {}, WN = {}, SET = {};
-    for (const p of list) { VEC[p.id] = personVec(p); SET[p.id] = settingsOf(p.id); WN[p.id] = normWeights(SET[p.id].weights); }
+    for (const p of list) { VEC[p.id] = personVec(p); SET[p.id] = settingsOf(p.id); WN[p.id] = effWeights(p, SET[p.id]); }
     for (const a of list) {
       const sa = SET[a.id];
       const recs = [], rejected = { R1: 0, R2: 0, R3: 0, R4: 0, R5: 0, R6: 0, R7: 0, nearestR4: null };
       for (const b of list) {
         if (b.id === a.id) continue;
+        if (opts.isBlocked && opts.isBlocked(a.id, b.id)) continue;
         if (!a.preference.gender.includes(b.gender)) continue;
         if (!b.preference.gender.includes(a.gender)) { rejected.R2++; continue; }
         const d = dist(a, b);
@@ -188,10 +198,21 @@ function createEngine(cfg) {
         if (why) { rejected[why.code]++; if (why.code === "R4" && (rejected.nearestR4 === null || d < rejected.nearestR4)) rejected.nearestR4 = d; continue; }
         const ab = scoreOne(a, b, d, WN[a.id], rarity, VEC[a.id], VEC[b.id], false).total;
         const ba = scoreOne(b, a, d, WN[b.id], rarity, VEC[b.id], VEC[a.id], false).total;
-        recs.push({ id: b.id, distance: d, score: Math.sqrt(ab * ba), ab, ba });
+        const raw = Math.sqrt(ab * ba);
+        recs.push({ id: b.id, distance: d, score: raw, raw, ab, ba, pop: 1 });
       }
       recs.sort((x, y) => (y.score - x.score) || (x.distance - y.distance));
       lists[a.id] = { recs, rejected };
+    }
+    // 인기 쏠림 완화: 여러 사람의 상위 3명에 자주 드는 사람은 점수를 조금씩 낮춰서 고르게 노출
+    const popCount = {};
+    for (const p of list) for (const r of lists[p.id].recs.slice(0, 3)) popCount[r.id] = (popCount[r.id] || 0) + 1;
+    const free = cfg.pop_free ?? 3, damp = cfg.pop_damp ?? 0;
+    const popFactor = id => 1 / (1 + damp * Math.max(0, (popCount[id] || 0) - free));
+    if (damp > 0) for (const p of list) {
+      const recs = lists[p.id].recs;
+      for (const r of recs) { r.pop = popFactor(r.id); r.score = r.raw * r.pop; }
+      recs.sort((x, y) => (y.score - x.score) || (x.distance - y.distance));
     }
     // 자동 매칭: 서로가 1순위면 연결, 연결된 사람을 빼고 반복
     const auto = {};
@@ -211,7 +232,27 @@ function createEngine(cfg) {
       }
       if (!found) break;
     }
-    return { lists, auto, rarity, ctx: { rarity, VEC, WN } };
+    return { lists, auto, rarity, popCount, ctx: { rarity, VEC, WN } };
+  }
+  // 조건을 바꾸면 내 후보가 몇 명이 되는지 (조건 완화 제안용)
+  function countFor(list, me, settings, opts) {
+    opts = opts || {};
+    let n = 0;
+    for (const b of list) {
+      if (b.id === me.id) continue;
+      if (opts.isBlocked && opts.isBlocked(me.id, b.id)) continue;
+      if (!me.preference.gender.includes(b.gender) || !b.preference.gender.includes(me.gender)) continue;
+      const d = dist(me, b);
+      if (!filterOne(me, b, d, settings) && !filterOne(b, me, d, null)) n++;
+    }
+    return n;
+  }
+  // 두 사람 사이 항목별 유사도 (0~1), 마음 표현 학습용
+  function itemSims(ctx, a, b) {
+    const d = dist(a, b);
+    const ones = Object.fromEntries(KEYS.map(k => [k, 10]));
+    const sc = scoreOne(a, b, d, ones, ctx.rarity, ctx.VEC[a.id] || personVec(a), ctx.VEC[b.id] || personVec(b), true);
+    return Object.fromEntries(sc.parts.map(p => [p.key, Math.max(0, Math.min(1, p.pts / 10))]));
   }
   // 화면에 보이는 한 쌍만 근거까지 자세히 계산
   function explain(ctx, a, b) {
@@ -224,5 +265,5 @@ function createEngine(cfg) {
     };
   }
 
-  return { computeAll, explain, KEYS, LABEL, W0, tagSim, dist, CAT_OF, levelOf, vecOfTags, personVec, cosine, project2D, AXES: cfg.axes };
+  return { computeAll, explain, countFor, itemSims, baseWeights, effWeights, KEYS, LABEL, W0, tagSim, dist, CAT_OF, levelOf, vecOfTags, personVec, cosine, project2D, AXES: cfg.axes };
 }

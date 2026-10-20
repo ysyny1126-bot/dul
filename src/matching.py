@@ -12,6 +12,18 @@ TODAY = date(2026, 10, 14)
 # ---------------------------------------------------------------------------
 # 설정값 (가중치는 여기서만 바꾸면 됨)
 # ---------------------------------------------------------------------------
+# 만남 목적별 기본 가중치 (합계 100). 동네친구는 거리·관심사, 새로운 시작은 결혼관·소비를 더 봄
+PURPOSE_WEIGHTS = {
+    "friend":  {"interests": 30, "marriage_view": 0,  "contact_style": 12, "distance": 22, "appearance": 0,
+                "chronotype": 8, "weekend": 12, "drinking": 6, "spending": 4, "pet": 6},
+    "casual":  {"interests": 22, "marriage_view": 8,  "contact_style": 15, "distance": 12, "appearance": 14,
+                "chronotype": 6, "weekend": 8, "drinking": 7, "spending": 4, "pet": 4},
+    "serious": {"interests": 16, "marriage_view": 22, "contact_style": 15, "distance": 8, "appearance": 8,
+                "chronotype": 6, "weekend": 6, "drinking": 6, "spending": 9, "pet": 4},
+}
+POP_FREE = 3      # 다른 사람 상위 3명에 이 횟수까지는 그대로
+POP_DAMP = 0.03   # 넘는 1회마다 점수를 조금씩 낮춤 (인기 쏠림 완화)
+
 WEIGHTS = {
     "interests": 20, "marriage_view": 15, "contact_style": 15, "distance": 10,
     "appearance": 10, "chronotype": 6, "weekend": 6, "drinking": 6,
@@ -214,6 +226,7 @@ def filter_one_way(a, b, d):
 # 2단계: 점수 (A가 B를 볼 때)
 # ---------------------------------------------------------------------------
 def score_one_way(a, b, d, rarity):
+    W = PURPOSE_WEIGHTS.get(a["purpose"], WEIGHTS)
     reasons = []   # (점수, 설명)
     total = 0.0
     parts = []     # 화면용 항목별 내역: (key, 점수, 설명)
@@ -231,7 +244,7 @@ def score_one_way(a, b, d, rarity):
             k += best * rarity[t] * bonus
             hits.append(t if best == 1.0 else f"{t}≈{best_tag}")
     cos = cosine(person_vec(a), person_vec(b))
-    pts = (OVERLAP_SHARE * (1 - 0.5 ** k) + (1 - OVERLAP_SHARE) * spread(cos)) * WEIGHTS["interests"]
+    pts = (OVERLAP_SHARE * (1 - 0.5 ** k) + (1 - OVERLAP_SHARE) * spread(cos)) * W["interests"]
     total += pts
     parts.append(("interests", pts, (", ".join(hits) if hits else "겹침 없음") + f" · 좌표 유사도 {cos:.2f}"))
     if hits:
@@ -240,27 +253,27 @@ def score_one_way(a, b, d, rarity):
     # 순서형·일치형 항목
     for field in ["marriage_view", "drinking", "spending"]:
         s = ordinal_sim(field, a[field], b[field])
-        pts = s * WEIGHTS[field]
+        pts = s * W[field]
         total += pts
         parts.append((field, pts, f"{a[field]} / {b[field]}"))
         if s == 1.0:
             reasons.append((pts, f"{LABEL[field]} 같음"))
     for field in ["contact_style", "chronotype", "weekend"]:
         s = 1.0 if a[field] == b[field] else 0.0
-        pts = s * WEIGHTS[field]
+        pts = s * W[field]
         total += pts
         parts.append((field, pts, f"{a[field]} / {b[field]}"))
         if s:
             reasons.append((pts, f"{LABEL[field]} 같음"))
 
     s = pet_sim(a["pet"], b["pet"])
-    total += s * WEIGHTS["pet"]
-    parts.append(("pet", s * WEIGHTS["pet"], f"{a['pet']} / {b['pet']}"))
+    total += s * W["pet"]
+    parts.append(("pet", s * W["pet"], f"{a['pet']} / {b['pet']}"))
 
     # 거리
     max_d = min(a["preference"]["max_distance_km"], b["preference"]["max_distance_km"])
     s = max(0.0, 1 - d / max_d)
-    pts = s * WEIGHTS["distance"]
+    pts = s * W["distance"]
     total += pts
     parts.append(("distance", pts, f"{d:.1f}km / 기준 {max_d}km"))
     if s >= 0.5:
@@ -274,7 +287,7 @@ def score_one_way(a, b, d, rarity):
         s = len(matched) / len(wanted)
     else:
         s, matched = 1.0, []
-    pts = s * WEIGHTS["appearance"]
+    pts = s * W["appearance"]
     total += pts
     parts.append(("appearance", pts, f"원하는 {len(wanted)}개 중 {len(matched)}개 일치" if wanted else "상관없음"))
     if wanted and s > 0:
@@ -315,22 +328,37 @@ def run(people):
             ab, reasons, pen_ab, parts_ab = score_one_way(a, b, d, rarity)
             ba, _, pen_ba, parts_ba = score_one_way(b, a, d, rarity)
             final = math.sqrt(ab * ba)
+            Wa = PURPOSE_WEIGHTS.get(a["purpose"], WEIGHTS)
             reasons.sort(key=lambda x: -x[0])
             recs.append({
                 "id": b["id"], "nickname": b["nickname"], "age": age(b),
                 "region": b["location"]["region"], "distance_km": round(d, 1),
-                "score": round(final, 1), "a_to_b": round(ab, 1), "b_to_a": round(ba, 1),
+                "score": round(final, 1), "raw": final, "a_to_b": round(ab, 1), "b_to_a": round(ba, 1),
                 "top_reasons": [f"{r} (+{p:.0f})" for p, r in reasons[:3]],
                 "penalties": [f"{r} ({p})" for p, r in pen_ab],
                 "penalties_b": [f"{r} ({p})" for p, r in pen_ba],
                 "breakdown": [
                     {"key": k1, "label": LABEL.get(k1, {"interests": "관심사", "distance": "거리", "appearance": "외모"}.get(k1, k1)),
-                     "weight": WEIGHTS[k1], "a": round(p1, 1), "b": round(p2, 1), "a_note": n1, "b_note": n2}
+                     "weight": Wa[k1], "a": round(p1, 1), "b": round(p2, 1), "a_note": n1, "b_note": n2}
                     for (k1, p1, n1), (_, p2, n2) in zip(parts_ab, parts_ba)
                 ],
             })
-        recs.sort(key=lambda r: (-r["score"], r["distance_km"]))
+        recs.sort(key=lambda r: (-r["raw"], r["distance_km"]))
         results[a["id"]] = {"nickname": a["nickname"], "recommendations": recs, "rejected": rejected}
+    # 인기 쏠림 완화: 여러 사람의 상위 3명에 자주 드는 사람은 점수를 조금 낮춤
+    pop = {}
+    for r in results.values():
+        for rec in r["recommendations"][:3]:
+            pop[rec["id"]] = pop.get(rec["id"], 0) + 1
+    for r in results.values():
+        for rec in r["recommendations"]:
+            f = 1 / (1 + POP_DAMP * max(0, pop.get(rec["id"], 0) - POP_FREE))
+            rec["pop"] = round(f, 3)
+            rec["score"] = round(rec["raw"] * f, 1)
+            rec["_adj"] = rec["raw"] * f
+        r["recommendations"].sort(key=lambda x: (-x["_adj"], x["distance_km"]))
+        for rec in r["recommendations"]:
+            del rec["_adj"]; del rec["raw"]
     return results, rarity
 
 if __name__ == "__main__":

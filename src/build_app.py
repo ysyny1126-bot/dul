@@ -4,7 +4,7 @@ python3 build_app.py                    시연용 (가상 회원 500명 포함) 
 python3 build_app.py --real             실제 서비스용 (가상 회원 없음) → dul_real.html
 """
 import json
-from matching import load, run, age, WEIGHTS, PENALTY, DIST_PENALTY_PER_5KM, FAV_BONUS, RARITY_CAP, RELATED, CATEGORIES, CATEGORY_SIM, LEVEL_MULT, MAX_TOP_LEVEL, AXES, TAG_VEC, OVERLAP_SHARE, COS_FLOOR
+from matching import PURPOSE_WEIGHTS, POP_FREE, POP_DAMP, load, run, age, WEIGHTS, PENALTY, DIST_PENALTY_PER_5KM, FAV_BONUS, RARITY_CAP, RELATED, CATEGORIES, CATEGORY_SIM, LEVEL_MULT, MAX_TOP_LEVEL, AXES, TAG_VEC, OVERLAP_SHARE, COS_FLOOR
 
 import sys
 REAL = "--real" in sys.argv
@@ -29,7 +29,8 @@ cfg = {"weights": WEIGHTS, "penalty": PENALTY, "dist_penalty": DIST_PENALTY_PER_
        "fav_bonus": FAV_BONUS, "rarity_cap": RARITY_CAP, "related": RELATED,
        "categories": CATEGORIES, "category_sim": CATEGORY_SIM,
        "level_mult": {str(k): v for k, v in LEVEL_MULT.items()}, "max_top_level": MAX_TOP_LEVEL,
-       "axes": AXES, "tag_vec": TAG_VEC, "overlap_share": OVERLAP_SHARE, "cos_floor": COS_FLOOR, "auto_top_n": 3}
+       "axes": AXES, "tag_vec": TAG_VEC, "overlap_share": OVERLAP_SHARE, "cos_floor": COS_FLOOR, "auto_top_n": 3,
+       "purpose_weights": PURPOSE_WEIGHTS, "pop_free": POP_FREE, "pop_damp": POP_DAMP}
 data = {"profiles": profiles, "cfg": cfg, "real": REAL}
 if not REAL:
     json.dump({"data": data, "py": results}, open("app_data.json", "w", encoding="utf-8"), ensure_ascii=False)
