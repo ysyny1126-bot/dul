@@ -15,3 +15,5 @@ node_modules/
 .DS_Store
 Thumbs.db
 src/dul_real.html
+# AI 서버 키
+server/.env

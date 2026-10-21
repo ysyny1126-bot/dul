@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+python-dotenv
+anthropic
+# 배포판에서 Firebase 로그인 토큰을 확인할 때만 필요 (FIREBASE_PROJECT_ID를 채운 경우)
+google-auth

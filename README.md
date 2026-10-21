@@ -23,6 +23,13 @@
 - **관리자 화면**: 가입 현황, 신고 처리(이용 정지 / 문제 없음), 사진 인증 승인·반려, 정지 회원 관리, 인기 쏠림 현황
 - **이용약관·개인정보 처리방침**: 가입 때 동의 필수, 로그인 화면·내 정보에서 언제든 열람
 - **개발자 화면**: 스위치를 켜면 항목별 점수 계산서와 좌표 비교가 보임
+- **AI 기능 (LLM)** — AI 서버(`server/`, Claude API 또는 Ollama)가 켜져 있을 때. 자세한 내용은 [docs/AI.md](docs/AI.md)
+  - **AI 궁합 분석**: 프로필 상세에서 성향·연애 가치관·대화 스타일·연락 빈도를 비교해 잘 맞는 점, 다른 점, 첫 질문을 자연어로 설명 (순위는 매칭 엔진 점수 그대로)
+  - **AI 대화 코치**: 채팅 입력창 옆 AI 버튼 → 말투별 답장 후보 3개, 대화가 끊겼을 때 이어 갈 질문. 고르면 입력창에 들어가고 고쳐서 보냄
+  - **첫 만남 대화 주제**: 공통 관심사로 가벼운 질문, 대화 흐름, 피할 질문
+  - **AI 자기소개 도우미**: 내 정보에서 키워드·경험을 자연스러운 자기소개 후보 3개로
+  - **대화 안전 점검**: 금전 요구·투자 권유·협박 등 위험 표현을 기기 안에서 먼저 알리고, 원하면 AI가 문제점과 대응 방법을 설명 → 신고·차단으로 연결. AI가 단정하거나 자동 제재하지 않음
+  - **AI 데이트 플래너**: 예산·날짜·시간대로 중간 지점 근처 실제 장소(카카오/구글)를 엮어 일정, 영업시간, 이동 시간, 길찾기 링크
 
 ## 매칭 로직
 
@@ -73,6 +80,12 @@ dul/
 ├── firestore.rules        Firestore 보안 규칙
 ├── deploy.sh / deploy.bat 기존 데이터를 지우고 새로 배포
 ├── docs/DEPLOY.md         배포 방법 자세히
+├── docs/AI.md             AI 기능 설정·실행 방법
+├── server/                AI 서버 (FastAPI) — run_ai.bat / run_ai.sh 로 실행
+│   ├── main.py            기능별 API와 프롬프트, 시연판 화면 제공
+│   ├── llm.py             Claude API / Ollama 호출 (JSON 스키마로 답 모양 고정)
+│   ├── places.py          카카오·구글 장소 검색, 이동 시간, 길찾기 링크
+│   └── .env.example       키 설정 (복사해서 .env)
 └── src/
     ├── matching.py        매칭 로직 원본 (Python)
     ├── app_engine.js      같은 로직의 앱용 버전 (JavaScript)
@@ -92,6 +105,14 @@ python3 matching.py               # 처음 20명으로 매칭 결과 확인
 python3 gen_profiles.py           # 가상 회원 500명 다시 만들기 (결과는 항상 같음)
 python3 build_app.py              # 시연판 gyeol_app.html (가상 회원 500명)
 python3 build_deploy.py ..        # 배포판 public/index.html (실제 회원 전용)
+```
+
+## AI 기능까지 켜서 실행 (내 컴퓨터)
+
+```bash
+cd server
+copy .env.example .env      # ANTHROPIC_API_KEY 채우기 (또는 LLM_BACKEND=ollama)
+run_ai.bat                  # Mac/Linux: ./run_ai.sh  →  http://localhost:8000
 ```
 
 ## 배포

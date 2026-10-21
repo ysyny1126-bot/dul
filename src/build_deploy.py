@@ -14,6 +14,11 @@ app = re.sub(r"^<title>.*?</title>\n", "", app)
 app = re.sub(r'^<meta name="claude:viewport-fit-sides"[^>]*>\n', "", app)
 
 FB_VER = "10.12.2"
+# AI 서버 주소 (server/main.py를 올린 곳). 예: DUL_AI_URL=https://dul-ai-xxxx.run.app python3 build_deploy.py ..
+AI_URL = os.getenv("DUL_AI_URL", "").rstrip("/")
+ai_script = f'<script>window.DUL_AI_URL = "{AI_URL}";</script>\n' if AI_URL else ""
+if not AI_URL:
+    print("  (DUL_AI_URL이 없어서 AI 기능은 같은 주소의 /api 로 요청해요. Hosting 리라이트를 쓰지 않으면 AI 서버 주소를 넣어 다시 빌드하세요)")
 head = f'''<!doctype html>
 <html lang="ko">
 <head>
@@ -29,7 +34,7 @@ body {{ margin: 0; }}
 img {{ max-width: 100%; }}
 [hidden] {{ display: none !important; }}
 </style>
-<!-- Firebase 연결
+{ai_script}<!-- Firebase 연결
      - Firebase Hosting(*.web.app)에서 열면: Hosting이 자동으로 넣어주는 설정을 씀 (따로 넣을 것 없음)
      - GitHub Pages 등 다른 곳에서 열면: firebase-config.js에 적힌 설정을 씀 (비어 있으면 서버 없이 미리보기) -->
 <script src="firebase-config.js"></script>
@@ -234,6 +239,12 @@ GitHub 저장소에는 `gh-pages` 브랜치에 사이트 파일이 올라가 있
 ## 6. 데이터는 두고 고친 화면만 올릴 때
 
 `firebase deploy --only hosting`
+
+## 7. AI 기능 켜기 (선택)
+
+궁합 설명, 답장 추천, 자기소개 도우미, 안전 점검, 데이트 코스는 AI 서버(`server/`)가 있어야 동작해요.
+AI 서버를 올리고 `DUL_AI_URL=<서버 주소> python3 build_deploy.py ..`로 다시 빌드하세요. 자세한 방법은 [AI.md](AI.md)를 보세요.
+AI 서버가 없으면 AI 버튼을 눌렀을 때 "AI 서버에 연결하지 못했어요"라고 나오고, 나머지 기능은 그대로 써요.
 
 ## 알아둘 점
 

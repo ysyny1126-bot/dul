@@ -401,6 +401,35 @@ tr.pen td { color: var(--bad); }
 .learn-bar .mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--muted); opacity: .5; }
 .learn-row .v { text-align: right; font-family: var(--font-mono); font-size: 12px; }
 .suspended { padding-block: 60px; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+/* AI 기능: 점선 테두리 카드 안에 결과, 고를 수 있는 후보는 버튼 */
+.ai-box { background: var(--paper); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; border: 1.5px dashed var(--stroke); font-size: 14px; }
+.ai-box b.h, .ai-panel b.h { font-family: var(--font-hand); font-size: 20px; }
+.ai-box b.h::before, .ai-panel b.h::before { content: "✦ "; color: var(--rose); font-size: 15px; }
+.ai-panel { background: var(--surface); border-top: 1.5px dashed var(--stroke); padding-block: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 46vh; overflow-y: auto; font-size: 14px; }
+.ai-sub { font-size: 13px; color: var(--rose); margin-top: 2px; }
+.ai-wait { font-size: 13px; color: var(--muted); }
+.ai-wait::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: aidots 1.2s steps(4) infinite; }
+@keyframes aidots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+.ai-list { display: flex; flex-direction: column; gap: 6px; }
+.ai-cand { text-align: left; border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 8px 12px; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.ai-cand:hover { border-color: var(--stroke); }
+.ai-cand small { flex: none; color: var(--muted); font-size: 11px; }
+.ai-ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
+.ai-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ai-row > * { flex: 1 1 120px; min-width: 0; }
+.ai-row select, .ai-row input, .ai-box input[type=text] { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 7px 10px; background: var(--surface); font-size: 13px; }
+.ai-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.ai-step { border-top: 1.5px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.ai-step a { color: var(--rose); font-weight: 700; }
+.ai-leg { font-size: 12px; color: var(--muted); }
+.ai-leg a { font-weight: 400; }
+.lvl { display: inline-block; border-radius: 999px; padding: 1px 10px; font-size: 12px; font-weight: 700; margin-right: 4px; }
+.lvl.safe { background: var(--chip); color: var(--good); }
+.lvl.caution { background: var(--accent2-soft); color: var(--accent2); }
+.lvl.danger { background: var(--bad-soft); color: var(--bad); }
+.ai-alert { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-radius: 0; border-left: 0; border-right: 0; font-size: 13px; }
+.ai-alert span { flex: 1 1 160px; }
+.ai-note { font-size: 12px; color: var(--muted); }
 @media (max-width: 380px) { .row2 { grid-template-columns: 1fr; } }
 </style>
 
@@ -523,7 +552,7 @@ const PURPOSE_NOTE = { friend: "동네친구는 관심사와 거리를 가장 �
 const DEFAULT_SETTINGS = Object.freeze({ weights: null, tags: [], related: false });
 // 운영자 연락처 (배포 전에 적어주세요)
 const CONTACT_EMAIL = "";
-const TERMS_DATE = "2026년 10월 20일";
+const TERMS_DATE = "2026년 10월 21일";
 const POSES = ["오른손으로 브이(V) 하기", "왼손 엄지 척 하기", "두 손가락으로 작은 하트 만들기", "오른손 주먹을 턱에 대기", "왼손으로 볼 감싸기", "오른손 손바닥 보이며 인사하기"];
 const REPORT_REASONS = ["부적절한 사진", "불쾌하거나 위협적인 메시지", "돈이나 투자를 요구함", "다른 사람인 척함 (사칭)", "미성년자로 보여요", "기타"];
 const LOGO = `<div class="logo"><small>DUL · 둘</small><span>둘</span></div>`;
@@ -566,6 +595,7 @@ const S = {
   blocks: {}, reports: {}, mod: {}, verifs: {}, myVerif: null, isAdmin: false,
   menu: null, report: null, legal: null, notifOpen: false, admin: false, adminTab: "stats", planOpen: false, planMood: "auto", planPage: 0,
   authError: "",
+  ai: {}, aiOpen: false, aiTab: "reply", aiTone: "warm", riskSeen: {}, reportPreset: -1, reportDetail: "",
 };
 // ---------------- Firebase (배포판에서만 켜짐) ----------------
 const FB = () => (window.firebase && window.firebase.apps && window.firebase.apps.length) ? window.firebase : null;
@@ -1148,6 +1178,7 @@ function planCard(me, o) {
   const per = 3, pages = Math.max(1, Math.ceil(pl.courses.length / per)), page = S.planPage % pages;
   const shown = pl.courses.slice(page * per, page * per + per);
   return `<div class="plan"><div class="sig-head"><b class="h">${title}</b><button class="btn line sm" data-act="planopen">접기</button></div>
+    ${aiPlanBox(me, o)}
     <span style="font-size:14px">중간 지점 <b>${esc(pl.area)}</b> 근처로 골랐어요. 어떤 데이트가 끌려요?</span>
     <div class="tabs2" role="tablist" aria-label="데이트 분위기">${MOODS.map(([k, label]) => `<button role="tab" aria-selected="${S.planMood === k}" data-act="planmood" data-v="${k}">${label}</button>`).join("")}</div>
     <div class="course-list">${shown.map((c, i) => `<div class="course">
@@ -1184,8 +1215,8 @@ function reportView() {
     <div class="sheet${S.enter ? " enter" : ""}">
       <div class="sheet-head pad"><b>${esc(o.nickname)}님 신고하기</b><button class="icon-btn" data-act="closereport" aria-label="닫기">${ICON.close}</button></div>
       <form class="sheet-body pad f" id="report-form" style="padding-block:12px 16px">
-        <div class="fld"><span>어떤 문제인가요?</span><div class="radios col">${REPORT_REASONS.map((r, i) => `<label><input type="radio" name="rp-reason" id="rp-r${i}" value="${esc(r)}"> ${esc(r)}</label>`).join("")}</div></div>
-        <label class="fld"><span>자세한 내용 <small>· 선택</small></span><textarea id="rp-detail" maxlength="500" placeholder="언제, 어떤 일이 있었는지 적어주면 확인이 빨라요"></textarea></label>
+        <div class="fld"><span>어떤 문제인가요?</span><div class="radios col">${REPORT_REASONS.map((r, i) => `<label><input type="radio" name="rp-reason" id="rp-r${i}" value="${esc(r)}"${i === S.reportPreset ? " checked" : ""}> ${esc(r)}</label>`).join("")}</div></div>
+        <label class="fld"><span>자세한 내용 <small>· 선택</small></span><textarea id="rp-detail" maxlength="500" placeholder="언제, 어떤 일이 있었는지 적어주면 확인이 빨라요">${esc(S.reportDetail)}</textarea></label>
         <label class="check"><input type="checkbox" id="rp-block" checked> 이 사람을 차단도 할게요</label>
         ${S.authError ? `<p class="err">${esc(S.authError)}</p>` : ""}
         <button class="btn" type="submit">신고 보내기</button>
@@ -1207,10 +1238,11 @@ function legalHtml(kind) {
   return `<div class="legal">
     <p>시행일: ${TERMS_DATE}</p>
     <h4>1. 모으는 정보</h4><ul><li>필수: 아이디, 비밀번호(암호화되어 인증 서비스에만 저장), 닉네임, 성별, 생년월일, 사는 지역(구 단위), 만남 목적, 관심사, 생활 패턴, 원하는 상대 조건</li><li>선택: 프로필 사진, 직업, 키, 자기소개, 외모 정보, 사진 인증용 셀카</li><li>이용 중 생기는 정보: 좋아요, 마음 표현, 메시지와 보낸 사진, 차단·신고 기록</li></ul>
-    <h4>2. 쓰는 곳</h4><ul><li>잘 맞는 사람 추천과 자동 매칭, 관심사 검색</li><li>매칭된 회원과의 대화</li><li>신고 처리, 사칭 방지(사진 인증), 서비스 안전 관리</li></ul>
+    <h4>2. 쓰는 곳</h4><ul><li>잘 맞는 사람 추천과 자동 매칭, 관심사 검색</li><li>매칭된 회원과의 대화</li><li>신고 처리, 사칭 방지(사진 인증), 서비스 안전 관리</li><li>AI 기능(궁합 설명, 답장·대화 주제 추천, 자기소개 도우미, 대화 안전 점검, 데이트 코스)</li></ul>
+    <h4>2-1. AI 기능</h4><ul><li>AI 버튼을 직접 누를 때만, 그 기능에 필요한 정보(두 사람의 공개 프로필, 해당 대화의 최근 메시지, 고른 예산·날짜와 구 단위 위치)를 AI 서버로 보내요. 아이디, 생년월일, 사진, 종교는 보내지 않아요.</li><li>AI 서버는 답을 만든 뒤 받은 내용을 저장하지 않아요. 답을 만들 때 Anthropic(Claude API)을 이용하고, 데이트 코스의 장소 정보는 카카오 또는 Google 지도 검색을 이용해요.</li><li>대화 속 위험 표현(금전 요구 등)은 내 기기 안에서 먼저 확인해 알려 드려요. AI의 판단은 참고용이며, AI가 회원을 제재하지 않아요.</li></ul>
     <h4>3. 다른 회원에게 보이는 정보</h4><p>닉네임, 나이, 사는 지역, 사진, 직업, 키, 자기소개, 관심사, 생활 패턴이 다른 회원에게 보여요. 아이디와 생년월일 전체는 보이지 않아요. 검색 공개를 끄면 관심사 검색에 나오지 않아요.</p>
     <h4>4. 보관 기간</h4><p>탈퇴하면 프로필, 사진, 보낸 좋아요와 마음 표현, 차단 기록을 바로 지워요. 주고받은 대화는 상대방의 기록이기도 해서 상대 쪽에 남아요. 신고 기록은 분쟁 확인을 위해 처리 후 1년 동안 보관해요.</p>
-    <h4>5. 맡기는 곳</h4><p>회원 인증과 데이터 저장은 Google Firebase(Google LLC)를 이용해요. 그 밖의 곳에 개인정보를 팔거나 넘기지 않아요.</p>
+    <h4>5. 맡기는 곳</h4><p>회원 인증과 데이터 저장은 Google Firebase(Google LLC)를, AI 기능은 Anthropic(Claude API)을 이용해요(2-1 참고). 그 밖의 곳에 개인정보를 팔거나 넘기지 않아요.</p>
     <h4>6. 내 권리</h4><p>언제든 내 정보에서 프로필을 고치거나 탈퇴할 수 있고, 내 정보의 열람·정정·삭제를 요청할 수 있어요.</p>
     <h4>7. 문의</h4><p>개인정보 관련 문의는 ${contact}로 알려주세요.</p></div>`;
 }
@@ -1452,6 +1484,7 @@ function detailView(me) {
           ${o.bio ? `<p style="margin:0">${esc(o.bio)}</p>` : ""}
           ${r ? `<div class="panel" style="display:flex;flex-direction:column;gap:8px"><div><span class="grade${topg ? " top" : ""}">${g}</span></div>
             ${reasons.length ? `<ul class="reasons">${reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<span class="muted" style="font-size:14px">새로운 취향을 나눌 수 있는 사람이에요</span>`}</div>` : ""}
+          ${o.id !== me.id ? aiMatchBox(me, o) : ""}
           <div><div class="facts"><div style="grid-column:1/-1"><div class="k">관심사</div><div class="chips" style="margin-top:4px">${o.interests.map(t => `<span class="chip${common.has(t) ? " hit" : ""}">${esc(t)} <span class="muted" style="font-size:11px">${LEVEL_KO[E.levelOf(o, t)]}</span></span>`).join("")}</div></div>
             ${facts.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`).join("")}</div></div>
           ${isMatched(me.id, o.id) ? signalPanel(me, o, false) : ""}
@@ -1547,16 +1580,17 @@ function chatView(me) {
   }
   const base = BASE.profiles.find(p => p.id === o.id);
   const hint = base ? `${esc(o.nickname)}님은 가상 회원이에요. 답장해보려면 로그아웃한 뒤 <span class="num">${base.login_id}</span> / <span class="num">1234</span>로 로그인하세요.` : "";
-  const ok = isMatched(me.id, o.id);
+  const ok = isMatched(me.id, o.id), hits = ok ? riskScan(msgs, me.id) : [];
   return `<div class="overlay" role="dialog" aria-modal="true" aria-label="${esc(o.nickname)}님과 대화">
     <div class="scrim" data-act="closechat"></div>
     <div class="sheet full${S.enter ? " enter" : ""}">
       <div class="sheet-head pad"><button class="icon-btn" data-act="closechat" aria-label="뒤로">${ICON.back}</button>${photo(o, "av")}<b>${esc(o.nickname)}${vb(o)}</b>
         <button class="btn line sm" data-act="open" data-id="${o.id}">프로필</button><button class="icon-btn" data-act="menu" data-id="${o.id}" aria-label="차단·신고 메뉴">${ICON.dots}</button></div>
-      ${ok ? `<div class="pad" style="padding-block:10px 0;display:flex;flex-direction:column;gap:8px">${signalPanel(me, o, true)}${planCard(me, o)}</div>` : ""}
+      ${ok ? `<div class="pad" style="padding-block:10px 0;display:flex;flex-direction:column;gap:8px;flex:none;max-height:58vh;overflow-y:auto">${signalPanel(me, o, true)}${planCard(me, o)}</div>` : ""}
       <div class="log pad" id="chat-log">${hint ? `<div class="notice" style="font-size:13px">${hint}</div>` : ""}
         ${log || `<div class="empty">${EMPTY_ART}<b>${esc(o.nickname)}님과 매칭됐어요</b>공통 관심사로 먼저 말을 걸어보세요.</div>`}</div>
-      ${ok ? `<form class="composer pad" id="chat-form"><label class="attach" title="사진 보내기">${ICON.clip}<input type="file" id="chat-photo" accept="image/*" aria-label="사진 보내기"></label><input type="text" id="chat-input" placeholder="메시지 보내기" maxlength="500" autocomplete="off"><button class="btn sm" type="submit">보내기</button></form>`
+      ${ok ? riskAlert(o, key, hits) + aiChatPanel(me, o, key, hits) : ""}
+      ${ok ? `<form class="composer pad" id="chat-form"><label class="attach" title="사진 보내기">${ICON.clip}<input type="file" id="chat-photo" accept="image/*" aria-label="사진 보내기"></label><input type="text" id="chat-input" placeholder="메시지 보내기" maxlength="500" autocomplete="off"><button class="btn line sm" type="button" data-act="ai-open" aria-pressed="${S.aiOpen}" title="AI 답장 추천·대화 주제·안전 점검">AI</button><button class="btn sm" type="submit">보내기</button></form>`
         : `<div class="composer pad"><span class="muted" style="font-size:14px">${isBlocked(me.id, o.id) ? "차단한 사람과는 대화할 수 없어요" : "매칭된 사람과만 대화할 수 있어요"}</span></div>`}
     </div></div>`;
 }
@@ -1599,6 +1633,7 @@ function meView(me) {
     <form class="panel f" id="me-form">
       <h3 style="font-size:18px">프로필</h3>
       <label class="fld"><span>자기소개</span><textarea id="me-bio" maxlength="120">${esc(me.bio || "")}</textarea></label>
+      ${aiBioBox()}
       <div class="row2">
         <label class="fld"><span>직업</span><input type="text" id="me-job" maxlength="16" value="${esc(me.job || "")}"></label>
         <label class="fld"><span>사는 곳</span><select id="me-region">${regionOptions(me.region)}${REGIONS.some(r => r[0] === me.region) ? "" : `<option selected>${esc(me.region)}</option>`}</select></label>
@@ -1698,6 +1733,172 @@ function weightLabel(v, sum) {
   return p < 4 ? "안 봐요" : p < 9 ? "조금" : p < 16 ? "보통" : "많이";
 }
 
+// ---------------- AI 기능 (server/main.py 의 LLM 서버를 부름) ----------------
+// 비워 두면 같은 주소의 /api (시연판을 AI 서버에서 열 때). 배포판은 build_deploy.py가 DUL_AI_URL로 넣어 줌
+const AI_URL = String(window.DUL_AI_URL || "").replace(/\/$/, "");
+const aiState = slot => S.ai[slot] || {};
+async function aiFetch(path, body) {
+  const headers = { "Content-Type": "application/json" };
+  const u = S.fb && S.fb.auth().currentUser;
+  if (u) headers.Authorization = "Bearer " + await u.getIdToken();   // 서버가 로그인한 회원인지 확인
+  let r;
+  try { r = await fetch(`${AI_URL}/api/${path}`, { method: "POST", headers, body: JSON.stringify(body) }); }
+  catch (e) { throw new Error("AI 서버에 연결하지 못했어요. AI 서버가 켜져 있는지 확인해주세요."); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : "AI가 답하지 못했어요. 잠시 뒤 다시 해주세요.");
+  return j;
+}
+// 결과는 S.ai[slot]에 담아 두고 화면만 다시 그림 (같은 사람에게 다시 열면 그대로 보임)
+async function aiRun(slot, path, body) {
+  if (aiState(slot).loading) return;
+  S.ai[slot] = { loading: true }; render();
+  try { S.ai[slot] = { data: await aiFetch(path, body) }; }
+  catch (e) { S.ai[slot] = { error: e.message }; }
+  render();
+}
+function aiStatus(st) {
+  if (st.loading) return `<div class="ai-wait" role="status">AI가 생각하는 중이에요</div>`;
+  if (st.error) return `<div class="notice warn" style="font-size:13px">${esc(st.error)}</div>`;
+  return "";
+}
+// LLM에 보내는 프로필: 다른 회원에게도 보이는 정보만 (아이디, 생년월일, 좌표, 사진, 종교, 외모는 안 보냄)
+const AI_LIFE = ["purpose", "marriage_view", "contact_style", "chronotype", "weekend", "drinking", "smoking", "pet", "spending"];
+function aiPerson(p) {
+  return { nickname: p.nickname, age: p.age, region: p.region, job: p.job === "비공개" ? "" : p.job || "", bio: p.bio || "", mbti: p.mbti || "",
+    interests: p.interests.map(t => `${t}(${LEVEL_KO[E.levelOf(p, t)]})`),
+    life: Object.fromEntries(AI_LIFE.filter(f => p[f]).map(f => [FIELD_KO[f], f === "smoking" ? SMOKE_KO[p[f]] : KO[p[f]]])) };
+}
+function aiLog(me, o) {
+  const msgs = S.chats[pk(me.id, o.id)]?.messages || [];
+  return msgs.filter(m => !m.sig).slice(-30).map(m => ({ who: m.from === me.id ? "me" : "them", text: m.img ? "[사진]" : String(m.text).slice(0, 500) }));
+}
+
+// 위험 신호 1차 확인: 브라우저 안에서 단어만 보고 표시 (대화가 밖으로 나가지 않음). 자세한 판단은 회원이 원할 때만 AI에게
+const RISK = [
+  { k: "money", label: "금전 요구", high: true, re: /(돈\s?(좀|을|이)?\s?(빌려|보내|부쳐|필요)|송금|입금|계좌|이체|급전|대출|병원비|수술비|합의금|보증금|상품권|기프트\s?카드|문상|빌려\s?줄)/ },
+  { k: "invest", label: "투자 권유", high: true, re: /(투자|코인|비트코인|리딩\s?방|수익률|원금\s?보장|고수익|선물\s?거래|재테크|테더|usdt|거래소|마진)/i },
+  { k: "threat", label: "협박·위협", high: true, re: /(가만\s?안\s?둬|가만\s?두지\s?않|죽여|유포|퍼뜨릴|퍼트릴|뿌릴\s?거|신상|찾아\s?갈|찾아간다|협박|두고\s?보자|후회하게)/ },
+  { k: "personal", label: "개인정보 요구", high: true, re: /(주민\s?번호|인증\s?번호|비밀\s?번호|신분증|여권\s?사진|카드\s?번호|otp)/i },
+  { k: "offsite", label: "앱 밖으로 연락 유도", high: false, re: /(텔레그램|위챗|왓츠앱|whatsapp|오픈\s?채팅|라인\s?아이디|https?:\/\/|bit\.ly)/i },
+];
+function riskScan(msgs, meId) {
+  const hits = [];
+  let run = 0, maxRun = 0;
+  for (const m of msgs) {
+    if (m.sig) continue;
+    if (m.from === meId) { run = 0; continue; }
+    maxRun = Math.max(maxRun, ++run);
+    if (m.text) for (const r of RISK) if (r.re.test(m.text)) hits.push({ k: r.k, label: r.label, high: r.high, quote: m.text.slice(0, 100) });
+  }
+  if (maxRun >= 6) hits.push({ k: "repeat", label: "답 없이 이어지는 메시지", high: false, quote: `답장 없이 ${maxRun}개 연달아` });
+  return hits;
+}
+const LEVEL_LABEL = { safe: "괜찮아 보여요", caution: "주의가 필요해요", danger: "위험 신호가 있어요" };
+const SIGNAL_KO = { money: "금전 요구", invest: "투자 권유", threat: "협박·위협", harass: "괴롭힘", offsite: "외부 연락 유도", personal_info: "개인정보 요구", other: "기타" };
+const SIGNAL_REASON = { money: 2, invest: 2, threat: 1, harass: 1 };   // REPORT_REASONS 번호
+
+// 1. AI 맞춤형 매칭 (프로필 상세)
+function aiMatchBox(me, o) {
+  const st = aiState("match:" + pk(me.id, o.id)), d = st.data;
+  return `<div class="ai-box"><div class="sig-head"><b class="h">AI 궁합 분석</b>${d ? "" : `<button class="btn sm" data-act="ai-match" data-id="${o.id}"${st.loading ? " disabled" : ""}>분석 보기</button>`}</div>
+    ${aiStatus(st)}
+    ${d ? `<p style="margin:0">${esc(d.summary)}</p>
+      ${d.common.length ? `<b class="ai-sub">비슷한 점</b><ul class="reasons">${d.common.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${d.differences.length ? `<b class="ai-sub">서로 맞춰 가면 좋은 점</b><ul class="ai-ul">${d.differences.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${d.questions.length ? `<b class="ai-sub">서로 알아 가기 좋은 질문</b><ul class="ai-ul">${d.questions.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      <span class="ai-note">추천 순위는 매칭 점수로 정하고, AI는 그 이유를 풀어서 설명해요.</span>`
+    : st.loading || st.error ? "" : `<span class="muted" style="font-size:13px">성향, 연애 가치관, 대화 스타일, 연락 빈도를 비교해서 잘 맞는 점과 다른 점을 설명해드려요.</span>`}
+  </div>`;
+}
+
+// 2·3·5. 채팅 안 AI 도우미: 답장 추천 / 첫 만남 대화 주제 / 안전 점검
+const TONES = [["warm", "다정하게"], ["fun", "유쾌하게"], ["calm", "차분하게"], ["short", "짧고 담백하게"]];
+function aiChatPanel(me, o, key, hits) {
+  if (!S.aiOpen) return "";
+  const tab = S.aiTab;
+  const tabs = `<div class="tabs2" role="tablist" aria-label="AI 도우미">${[["reply", "답장 추천"], ["topics", "첫 만남 대화 주제"], ["safety", "안전 점검"]].map(([k, l]) =>
+    `<button role="tab" aria-selected="${tab === k}" data-act="ai-tab" data-v="${k}">${l}</button>`).join("")}</div>`;
+  let body = "";
+  if (tab === "reply") {
+    const st = aiState("reply:" + key), d = st.data;
+    body = `<div class="tabs2" role="tablist" aria-label="말투">${TONES.map(([k, l]) => `<button role="tab" aria-selected="${S.aiTone === k}" data-act="ai-tone" data-v="${k}">${l}</button>`).join("")}</div>
+      <button class="btn sm" style="align-self:flex-start" data-act="ai-reply"${st.loading ? " disabled" : ""}>${d ? "다시 추천받기" : "답장 추천받기"}</button>
+      ${aiStatus(st)}
+      ${d ? `<div class="ai-list">${d.replies.map(r => `<button class="ai-cand" data-act="ai-use" data-text="${esc(r.text)}"><span>${esc(r.text)}</span><small>${esc(r.style)}</small></button>`).join("")}</div>
+        ${d.followups.length ? `<b class="ai-sub">대화가 끊겼을 때 이어 갈 질문</b><div class="ai-list">${d.followups.map(q => `<button class="ai-cand" data-act="ai-use" data-text="${esc(q)}"><span>${esc(q)}</span></button>`).join("")}</div>` : ""}
+        ${d.tip ? `<span class="ai-note">💡 ${esc(d.tip)}</span>` : ""}`
+      : `<span class="ai-note">상대 메시지와 지난 대화를 보고 고른 말투로 답장 후보를 만들어요. 고른 문장은 입력창에 들어가니 고쳐서 보내세요.</span>`}`;
+  } else if (tab === "topics") {
+    const st = aiState("topics:" + key), d = st.data;
+    body = `<button class="btn sm" style="align-self:flex-start" data-act="ai-topics"${st.loading ? " disabled" : ""}>${d ? "다른 주제 받기" : "대화 주제 추천받기"}</button>
+      ${aiStatus(st)}
+      ${d ? `${d.topics.map(t => `<div class="ai-step"><b>${esc(t.theme)}</b><span class="ai-note">${esc(t.why)}</span><ul class="ai-ul">${t.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>`).join("")}
+        ${d.flow.length ? `<b class="ai-sub">자연스러운 대화 흐름</b><ol class="ai-ul">${d.flow.map(x => `<li>${esc(x)}</li>`).join("")}</ol>` : ""}
+        ${d.avoid.length ? `<b class="ai-sub">첫 만남에서는 피해 주세요</b><ul class="ai-ul">${d.avoid.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}`
+      : `<span class="ai-note">두 분의 공통 관심사와 프로필로 첫 만남에서 꺼내기 좋은 가벼운 질문과 대화 흐름을 골라드려요.</span>`}`;
+  } else {
+    const st = aiState("safety:" + key), d = st.data;
+    const labels = [...new Set(hits.map(h => h.label))];
+    body = `${labels.length ? `<div class="notice${hits.some(h => h.high) ? " warn" : ""}" style="font-size:13px">자동 확인에서 눈에 띈 표현 · ${esc(labels.join(", "))}</div>` : `<span class="ai-note">자동 확인에서 눈에 띄는 표현은 없었어요.</span>`}
+      <button class="btn sm" style="align-self:flex-start" data-act="ai-safety"${st.loading ? " disabled" : ""}>AI로 대화 점검하기</button>
+      ${aiStatus(st)}
+      ${d ? `<div><span class="lvl ${esc(d.level)}">${LEVEL_LABEL[d.level] || ""}</span>${esc(d.summary)}</div>
+        ${d.signals.length ? `<b class="ai-sub">살펴볼 부분</b><ul class="ai-ul">${d.signals.map(s => `<li><b>${SIGNAL_KO[s.type] || "기타"}</b> · "${esc(s.quote)}"<br><span class="ai-note">${esc(s.why)}</span></li>`).join("")}</ul>` : ""}
+        ${d.advice.length ? `<b class="ai-sub">이렇게 해 보세요</b><ul class="ai-ul">${d.advice.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+        ${d.level !== "safe" ? `<div class="ai-row" style="flex-wrap:nowrap"><button class="btn sm${d.suggest === "none" ? " line" : ""}" data-act="ai-report" data-id="${o.id}">신고하기</button><button class="btn line sm" data-act="menu" data-id="${o.id}">차단하기</button></div>` : ""}` : ""}
+      <span class="ai-note">AI 점검은 참고용이에요. AI가 상대를 사기꾼으로 단정하거나 자동으로 제재하지 않아요. 신고와 차단은 직접 정해주세요.</span>`;
+  }
+  return `<div class="ai-panel pad"><div class="sig-head"><b class="h">AI 도우미</b><button class="btn line sm" data-act="ai-open">닫기</button></div>${tabs}${body}</div>`;
+}
+// 위험 표현이 새로 보이면 입력창 위에 알림 (닫으면 그 개수까지는 다시 안 띄움)
+function riskAlert(o, key, hits) {
+  const high = hits.filter(h => h.high);
+  if (!high.length || high.length <= (S.riskSeen[key] || 0)) return "";
+  return `<div class="notice warn pad ai-alert" role="alert"><span>⚠ ${esc(o.nickname)}님 메시지에 ${esc([...new Set(high.map(h => h.label))].join(", "))}로 보일 수 있는 표현이 있어요. 돈을 보내거나 개인정보를 알려주기 전에 꼭 확인하세요.</span>
+    <button class="btn sm" data-act="ai-safe-open">자세히</button><button class="btn line sm" data-act="ai-safe-hide" data-n="${high.length}">괜찮아요</button></div>`;
+}
+
+// 4. AI 프로필 작성 도우미 (내 정보 → 자기소개)
+function aiBioBox() {
+  const st = aiState("bio"), d = st.data;
+  return `<div class="ai-box"><b class="h">AI 자기소개 도우미</b>
+    <label class="fld"><span>키워드나 경험 <small>· 짧게 적어도 돼요</small></span><input type="text" id="me-bio-kw" maxlength="200" placeholder="예: 카페 좋아하고 음악 좋아함"></label>
+    <button type="button" class="btn sm" style="align-self:flex-start" data-act="ai-bio"${st.loading ? " disabled" : ""}>${d ? "다시 써 보기" : "자기소개 써 보기"}</button>
+    ${aiStatus(st)}
+    ${d ? `<div class="ai-list">${d.candidates.map(c => `<button type="button" class="ai-cand" data-act="ai-bio-use" data-text="${esc(c.text)}"><span>${esc(c.text)}</span><small>${esc(c.point)}</small></button>`).join("")}</div>
+      ${d.tip ? `<span class="ai-note">💡 ${esc(d.tip)}</span>` : ""}<span class="ai-note">고른 문장은 위 자기소개 칸에 들어가요. 고친 뒤 '저장'을 눌러야 반영돼요.</span>` : ""}
+  </div>`;
+}
+
+// 6. AI 데이트 플래너 (데이트 코스 추천 안)
+const AI_BUDGETS = ["", "1인 2만 원 안쪽", "1인 4만 원 안쪽", "1인 7만 원 안쪽"];
+const AI_TIMES = ["오전", "점심", "오후", "저녁"];
+function aiPlanBox(me, o) {
+  const st = aiState("plan:" + pk(me.id, o.id)), d = st.data;
+  const res = d ? `<div><b>${esc(d.title)}</b><br><span style="font-size:13px">${esc(d.summary)}</span></div>
+    <ol class="ai-steps">${d.steps.map(s => `<li class="ai-step">
+      ${s.leg ? `<span class="ai-leg">↓ 앞 장소에서 ${esc(s.leg.mode)} 약 ${s.leg.min}분 (${s.leg.km}km) · <a href="${esc(s.leg.url)}" target="_blank" rel="noopener">길찾기</a></span>` : ""}
+      <span><b>${esc(s.time)}</b> · ${esc(s.activity)}</span>
+      ${s.place ? `<span><a href="${esc(s.place.url)}" target="_blank" rel="noopener">${esc(s.place.name)}</a> <span class="ai-note">${esc(s.place.address)}</span></span>
+        <span class="ai-note">${s.place.hours ? `그날 영업시간 · ${esc(s.place.hours)}` : s.place.has_hours ? "영업시간 · 날짜를 고르면 그날 시간을 보여드려요" : "영업시간은 장소 링크에서 확인해주세요"}</span>`
+        : `<span><a href="${esc(s.search_url)}" target="_blank" rel="noopener">지도에서 '${esc(s.search_query)}' 찾기</a></span>`}
+      <span class="ai-note">${esc(s.why)} · ${esc(s.cost)}</span></li>`).join("")}</ol>
+    ${d.budget_note ? `<span style="font-size:13px">${esc(d.budget_note)}</span>` : ""}
+    ${d.tips.length ? `<ul class="ai-ul" style="font-size:13px">${d.tips.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    <span class="ai-note">${d.provider === "none" ? "실제 장소 검색 없이 만든 코스예요. 지도 링크로 장소를 골라 보세요." : "이동 시간은 직선거리로 어림한 값이에요."} 영업시간과 가격은 바뀔 수 있으니 가기 전에 한 번 더 확인해주세요.</span>
+    <button class="btn sm" style="align-self:flex-start" data-act="ai-plan-send">이 코스 제안하기</button>` : "";
+  return `<div class="ai-box"><b class="h">AI 맞춤 코스 짜기</b>
+    <span class="ai-note">두 분 취향, 예산, 시간에 맞춰 중간 지점 근처 실제 장소로 일정을 짜드려요.</span>
+    <div class="ai-row">
+      <select id="ai-budget" aria-label="예산">${AI_BUDGETS.map(b => `<option value="${esc(b)}">${b || "예산 상관없음"}</option>`).join("")}</select>
+      <input type="date" id="ai-date" aria-label="날짜" min="${today()}">
+      <select id="ai-time" aria-label="시간대">${AI_TIMES.map(t => `<option${t === "오후" ? " selected" : ""}>${t}</option>`).join("")}</select>
+    </div>
+    <input type="text" id="ai-req" maxlength="100" placeholder="바라는 점 · 선택 (예: 비 오면 실내, 조용한 곳)">
+    <button class="btn sm" style="align-self:flex-start" data-act="ai-plan"${st.loading ? " disabled" : ""}>${d ? "다시 짜기" : "코스 짜기"}</button>
+    ${aiStatus(st)}${res}</div>`;
+}
+
 // ---------------- 렌더 ----------------
 let lastScreen = "";
 function render() {
@@ -1753,7 +1954,63 @@ document.addEventListener("click", e => {
     case "open": S.detail = id; render(); break;
     case "close": S.detail = null; render(); break;
     case "openchat": S.chat = id; S.detail = null; S.sigOpen = false; render(); break;
-    case "closechat": S.chat = null; S.sigOpen = false; S.planOpen = false; S.planMood = "auto"; S.planPage = 0; render(); break;
+    case "closechat": S.chat = null; S.sigOpen = false; S.planOpen = false; S.planMood = "auto"; S.planPage = 0; S.aiOpen = false; render(); break;
+    // ---------- AI ----------
+    case "ai-match": {
+      const w = world(), o = w.byId[id]; if (!o) break;
+      const r = full(me, w.lists[me].recs.find(x => x.id === id));
+      aiRun("match:" + pk(me, id), "match-insight", { me: aiPerson(w.byId[me]), other: aiPerson(o),
+        reasons: r ? r.reasons.map(reasonText).filter(Boolean).slice(0, 12) : [], score: r ? Math.round(r.score) : null });
+      break;
+    }
+    case "ai-open": S.aiOpen = !S.aiOpen; render(); break;
+    case "ai-tab": S.aiTab = t.dataset.v; render(); break;
+    case "ai-tone": S.aiTone = t.dataset.v; render(); break;
+    case "ai-reply": case "ai-topics": case "ai-safety": {
+      const w = world(), meP = w.byId[me], o = w.byId[S.chat]; if (!o) break;
+      const key = pk(me, o.id), log = aiLog(meP, o), msgs = S.chats[key]?.messages || [];
+      if (act === "ai-reply") aiRun("reply:" + key, "chat-coach", { me: aiPerson(meP), other: aiPerson(o), messages: log, tone: S.aiTone,
+        stale: !!msgs.length && Date.now() - msgs[msgs.length - 1].at > 864e5 });
+      else if (act === "ai-topics") { const plan = msgs.filter(m => m.text?.startsWith("[데이트 제안]")).pop();
+        aiRun("topics:" + key, "first-meet", { me: aiPerson(meP), other: aiPerson(o), plan: plan ? plan.text.slice(0, 200) : "" }); }
+      else { if (!log.some(m => m.who === "them")) return toast("아직 상대가 보낸 메시지가 없어요");
+        aiRun("safety:" + key, "safety", { other_nickname: o.nickname, messages: log,
+          rule_hits: riskScan(msgs, me).map(h => ({ label: h.label, quote: h.quote })).slice(0, 20) }); }
+      break;
+    }
+    case "ai-use": { const inp = document.getElementById("chat-input"); if (inp) { inp.value = t.dataset.text; inp.focus(); } break; }
+    case "ai-safe-open": S.aiOpen = true; S.aiTab = "safety"; render(); break;
+    case "ai-safe-hide": S.riskSeen[pk(me, S.chat)] = +t.dataset.n; render(); break;
+    case "ai-report": {
+      const d = aiState("safety:" + pk(me, id)).data;
+      const top = d?.signals.find(s => s.type in SIGNAL_REASON);
+      S.reportPreset = top ? SIGNAL_REASON[top.type] : REPORT_REASONS.length - 1;
+      S.reportDetail = d ? `[AI 점검 참고] ${d.summary}`.slice(0, 500) : "";
+      S.report = id; S.authError = ""; render(); break;
+    }
+    case "ai-bio": {
+      const kw = document.getElementById("me-bio-kw")?.value.trim() || "", cur = document.getElementById("me-bio")?.value.trim() || "";
+      if (!kw && !cur) return toast("키워드나 경험을 조금 적어주세요");
+      aiRun("bio", "profile-bio", { me: aiPerson(world().byId[me]), keywords: kw, current: cur });
+      break;
+    }
+    case "ai-bio-use": { const ta = document.getElementById("me-bio"); if (ta) { ta.value = t.dataset.text; ta.focus(); } break; }
+    case "ai-plan": {
+      const w = world(), meP = w.byId[me], o = w.byId[S.chat]; if (!o) break;
+      const pl = meetPlan(meP, o, S.planMood), v = x => document.getElementById(x)?.value || "";
+      const keywords = [...new Set(pl.courses.slice(0, 4).flatMap(c => c.steps.map(st => st.split("|")[1]).filter(Boolean)))].slice(0, 6);
+      aiRun("plan:" + pk(me, o.id), "date-plan", { me: aiPerson(meP), other: aiPerson(o), area: pl.area,
+        lat: (meP.lat + o.lat) / 2, lng: (meP.lng + o.lng) / 2, budget: v("ai-budget"), date: v("ai-date"), time: v("ai-time"),
+        mood: MOODS.find(m => m[0] === S.planMood)[1], request: v("ai-req").trim(), keywords, no_drink: pl.noDrink });
+      break;
+    }
+    case "ai-plan-send": {
+      const o = world().byId[S.chat], d = o && aiState("plan:" + pk(me, o.id)).data; if (!d) break;
+      const route = d.steps.map(s => s.place?.name || s.activity).join(" → ");
+      const when = [document.getElementById("ai-date")?.value, d.steps[0]?.time].filter(Boolean).join(" ");
+      sendMsg(pk(me, o.id), me, `[데이트 제안] ${d.area} 근처 '${d.title}' 코스 어때요? ${route}${when ? " · " + when : ""}`.slice(0, 500));
+      S.planOpen = false; toast("데이트 코스를 제안했어요"); break;
+    }
     case "lightbox": { const im = S.imgs[t.dataset.img]; if (im) { S.lightbox = im.src; render(); } break; }
     case "closelb": S.lightbox = null; render(); break;
     case "sigopen": S.sigOpen = !S.sigOpen; render(); break;
@@ -1795,7 +2052,7 @@ document.addEventListener("click", e => {
     case "block": { const on = !blockedByMe(me, id); if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
       setBlock(id, on); S.menu = null; if (on) { if (S.chat === id) S.chat = null; if (S.detail === id) S.detail = null; } toast(on ? "차단했어요. 서로 보이지 않아요" : "차단을 풀었어요"); break; }
     case "unblock": setBlock(id, false); toast("차단을 풀었어요"); break;
-    case "reportopen": S.menu = null; S.report = id; S.authError = ""; render(); break;
+    case "reportopen": S.menu = null; S.report = id; S.authError = ""; S.reportPreset = -1; S.reportDetail = ""; render(); break;
     case "closereport": S.report = null; S.authError = ""; render(); break;
     case "legal": S.legal = t.dataset.v; render(); break;
     case "closelegal": S.legal = null; render(); break;
@@ -1911,6 +2168,7 @@ document.addEventListener("submit", async e => {
     return;
   }
   if (f.id === "me-form") {
+    if (document.activeElement?.id === "me-bio-kw") return document.querySelector('[data-act="ai-bio"]')?.click();   // 키워드 칸에서 엔터 = 자기소개 써 보기
     if (!S.canWrite) return toast("보기 전용이라 저장할 수 없어요");
     const me = world().byId[S.uid], d = S.draft;
     if (!d.tags.length) return toast("관심사를 1개 이상 골라주세요");
