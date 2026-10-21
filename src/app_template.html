@@ -379,6 +379,17 @@ tr.pen td { color: var(--bad); }
 .plan b.h { font-family: var(--font-hand); font-size: 20px; }
 .plan-opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 0; border-top: 1.5px dashed var(--line); font-size: 14px; }
 .plan-opt a { color: var(--rose); font-size: 13px; }
+.course-list { display: flex; flex-direction: column; gap: 8px; max-height: 42vh; overflow-y: auto; }
+.course { border-top: 1.5px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.course-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.course-head .muted { font-size: 12px; }
+.course-why { font-size: 12px; color: var(--rose); font-weight: 700; }
+.course-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; counter-reset: st; }
+.course-steps li { counter-increment: st; display: inline-flex; align-items: center; gap: 4px; background: var(--chip); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
+.course-steps li::before { content: counter(st); font-family: var(--font-mono); font-size: 11px; color: var(--rose); }
+.course-steps li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 2px; }
+.course-steps a { color: var(--ink); text-decoration: underline dotted var(--stroke); }
+.course-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .relax { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; text-align: left; }
 .relax button { border: 1.5px solid var(--stroke); background: var(--surface); border-radius: 12px; padding: 9px 12px; cursor: pointer; text-align: left; display: flex; justify-content: space-between; gap: 8px; color: var(--ink); }
 .relax button b { color: var(--rose); white-space: nowrap; }
@@ -515,7 +526,6 @@ const CONTACT_EMAIL = "";
 const TERMS_DATE = "2026년 10월 20일";
 const POSES = ["오른손으로 브이(V) 하기", "왼손 엄지 척 하기", "두 손가락으로 작은 하트 만들기", "오른손 주먹을 턱에 대기", "왼손으로 볼 감싸기", "오른손 손바닥 보이며 인사하기"];
 const REPORT_REASONS = ["부적절한 사진", "불쾌하거나 위협적인 메시지", "돈이나 투자를 요구함", "다른 사람인 척함 (사칭)", "미성년자로 보여요", "기타"];
-const PLACE = { 카페: "분위기 좋은 카페", 맛집: "동네 맛집", 와인: "와인바", 맥주: "수제맥주 펍", 요리: "쿠킹 클래스", 베이킹: "베이킹 원데이 클래스", 전시: "전시회", 미술: "미술관", 영화: "영화관", 드라마: "아늑한 카페", 넷플릭스: "영화관", 공연: "소극장 공연", 음악: "LP바", 기타: "어쿠스틱 공연", 피아노: "재즈바", 힙합: "힙합 공연", 독서: "북카페", 글쓰기: "북카페", 등산: "가벼운 등산로", 산책: "산책하기 좋은 공원", 러닝: "한강 러닝 코스", 캠핑: "캠핑장", 낚시: "낚시 카페", 여행: "근교 나들이", 사진: "사진 찍기 좋은 거리", 보드게임: "보드게임 카페", 게임: "오락실", 애니: "애니메이션 팝업스토어", 굿즈: "팝업스토어", 볼링: "볼링장", 클라이밍: "클라이밍장", 야구: "야구장", 축구: "풋살장", 농구: "농구장", 테니스: "테니스장", 골프: "스크린골프", 헬스: "건강한 브런치 가게", 요가: "요가 원데이 클래스", 수영: "한강 공원", 자전거: "자전거 길", 고양이: "고양이 카페", 강아지: "애견 카페", 쇼핑: "쇼핑몰", 코딩: "조용한 카페" };
 const LOGO = `<div class="logo"><small>DUL · 둘</small><span>둘</span></div>`;
 // 직접 그린 손그림 일러스트 (커피잔 건배 + 하트 + 말풍선)
 const ART = `<svg viewBox="0 0 320 210" role="img" aria-label="두 잔이 건배하는 손그림">
@@ -554,7 +564,7 @@ const S = {
   dev: false, passed: {}, toast: null, signup: { tags: [], lv: {}, photo: null }, draft: null, read: {},
   pickCat: { su: CAT_NAMES[0], me: CAT_NAMES[0], f: CAT_NAMES[0] }, q: "",
   blocks: {}, reports: {}, mod: {}, verifs: {}, myVerif: null, isAdmin: false,
-  menu: null, report: null, legal: null, notifOpen: false, admin: false, adminTab: "stats", planOpen: false,
+  menu: null, report: null, legal: null, notifOpen: false, admin: false, adminTab: "stats", planOpen: false, planMood: "auto", planPage: 0,
   authError: "",
 };
 // ---------------- Firebase (배포판에서만 켜짐) ----------------
@@ -1054,29 +1064,101 @@ function notifView(me) {
     </div></div>`;
 }
 
-// ---------- 약속 잡기 도우미 ----------
+// ---------- 데이트 코스 추천 ----------
 const wantsMeet = k => k === "meet" || k === "again";
-function meetPlan(me, o) {
+// 분위기: auto는 두 사람 취향만 보고 고름
+const MOODS = [["auto", "취향 맞춤"], ["light", "가볍게"], ["fun", "신나게"], ["active", "몸 쓰는"], ["culture", "감성·문화"], ["food", "맛있게"], ["cozy", "아늑하게"]];
+// 코스: 단계는 "보이는 이름|지도 검색어" (검색어가 비면 지도 링크 없음), cost 1~3, out = 야외, drink = 술이 중심인 코스
+const COURSES = [
+  { t: "카페 & 동네 산책", m: ["light"], tags: ["카페", "산책"], steps: ["분위기 좋은 카페|카페", "근처 공원 산책|공원"], dur: "1~2시간", cost: 1, note: "처음 만날 때 부담 없는 기본 코스예요" },
+  { t: "디저트 투어", m: ["light", "food"], tags: ["카페", "베이킹", "맛집"], steps: ["유명 베이커리|베이커리", "디저트 카페|디저트", "골목 산책|카페거리"], dur: "2시간", cost: 1, note: "빵 하나씩 나눠 먹으며 취향을 알아가요" },
+  { t: "북카페 데이트", m: ["light", "cozy", "culture"], tags: ["독서", "글쓰기", "카페"], steps: ["북카페|북카페", "독립서점 구경|독립서점", "조용한 찻집|찻집"], dur: "2시간", cost: 1, note: "서로 인생 책 한 권씩 골라주기 어때요?" },
+  { t: "전시 보고 브런치", m: ["culture", "light"], tags: ["전시", "미술", "사진"], steps: ["전시회·미술관|전시회", "브런치 카페|브런치", "사진 찍기 좋은 골목|포토스팟"], dur: "3시간", cost: 2, note: "작품 얘기로 자연스럽게 대화가 이어져요" },
+  { t: "영화 보고 저녁", m: ["culture", "cozy", "light"], tags: ["영화", "드라마", "넷플릭스"], steps: ["영화관|영화관", "감상 나누기 좋은 식당|맛집"], dur: "3~4시간", cost: 2, note: "보고 나서 감상 나누는 시간이 진짜 데이트예요" },
+  { t: "공방 원데이 클래스", m: ["cozy", "culture"], tags: ["미술", "글쓰기", "굿즈", "사진", "기타"], steps: ["향수·도자기·반지 공방|원데이클래스 공방", "근처 카페|카페"], dur: "2~3시간", cost: 2, note: "함께 만든 물건이 기념품으로 남아요" },
+  { t: "쿠킹·베이킹 클래스", m: ["food", "cozy"], tags: ["요리", "베이킹"], steps: ["쿠킹·베이킹 원데이 클래스|쿠킹클래스", "만든 음식 나눠 먹기|", "소화시킬 겸 산책|공원"], dur: "3시간", cost: 2, note: "같이 손을 쓰면 어색함이 금방 풀려요" },
+  { t: "고양이·애견 카페", m: ["cozy", "light"], tags: ["고양이", "강아지"], steps: ["고양이·애견 카페|애견카페", "디저트 카페|디저트"], dur: "2시간", cost: 1, note: "동물 얘기면 대화 걱정이 없어요" },
+  { t: "반려견 동반 피크닉", m: ["active", "light"], tags: ["강아지", "산책"], steps: ["반려견 동반 공원|반려견 동반 공원", "애견 동반 카페|애견동반 카페"], dur: "2~3시간", cost: 1, out: true, note: "각자 강아지를 데려와도 좋아요" },
+  { t: "가벼운 등산 & 산채비빔밥", m: ["active"], tags: ["등산", "산책", "맛집"], steps: ["초보 등산로|등산로", "산 아래 산채비빔밥집|산채비빔밥", "전망 좋은 카페|전망 카페"], dur: "4시간", cost: 1, out: true, note: "1~2시간짜리 쉬운 코스로 골라야 대화할 여유가 있어요" },
+  { t: "강변 자전거 & 노을", m: ["active", "light"], tags: ["자전거", "산책", "러닝"], steps: ["자전거 대여소|자전거 대여", "강변 라이딩|한강공원", "노을 보며 편의점 라면|"], dur: "3시간", cost: 1, out: true, note: "해 지기 1~2시간 전에 출발하면 노을까지 봐요" },
+  { t: "같이 뛰고 브런치", m: ["active"], tags: ["러닝", "헬스", "요가"], steps: ["공원 러닝 코스 5km|러닝 코스", "샐러드·브런치 가게|샐러드", "스무디 카페|스무디"], dur: "3시간", cost: 1, out: true, note: "서로 페이스를 맞춰 천천히 달려요" },
+  { t: "실내 클라이밍 체험", m: ["active", "fun"], tags: ["클라이밍", "헬스", "요가"], steps: ["클라이밍장 일일 체험|클라이밍", "든든한 맛집|맛집", "카페|카페"], dur: "3~4시간", cost: 2, note: "서로 응원하다 보면 금방 친해져요" },
+  { t: "스포츠 원데이 레슨", m: ["active", "fun"], tags: ["테니스", "농구", "축구", "수영", "골프"], steps: ["테니스·스크린골프 원데이|테니스 레슨", "근처 맛집|맛집", "시원한 음료 한잔|카페"], dur: "3시간", cost: 2, note: "둘 다 초보면 오히려 더 재밌어요" },
+  { t: "근교 캠핑·피크닉", m: ["active", "fun"], tags: ["캠핑", "여행", "사진", "낚시"], steps: ["근교 글램핑·피크닉장|글램핑", "바비큐 저녁|바비큐", "불멍·별 보기|"], dur: "반나절", cost: 3, out: true, note: "장비가 다 있는 글램핑이면 준비가 쉬워요" },
+  { t: "기차 타고 근교 나들이", m: ["active", "food"], tags: ["여행", "사진", "맛집"], steps: ["근교 기차 여행|기차역", "현지 시장·맛집|전통시장", "바다·호수 뷰 카페|오션뷰 카페"], dur: "하루", cost: 2, out: true, note: "두세 번 만난 뒤에 하면 좋은 코스예요" },
+  { t: "야구장 직관", m: ["fun"], tags: ["야구", "축구", "맥주"], steps: ["야구장 응원석|야구장", "경기장 치킨|치킨", "근처 포차|포차"], dur: "4시간", cost: 2, note: "같은 팀을 응원하면 바로 한편이 돼요" },
+  { t: "볼링 & 오락실", m: ["fun", "light"], tags: ["볼링", "게임"], steps: ["볼링장 2게임|볼링장", "오락실·인형뽑기|오락실", "떡볶이 맛집|떡볶이"], dur: "3시간", cost: 1, note: "진 사람이 떡볶이 사기!" },
+  { t: "방탈출 & 보드게임", m: ["fun"], tags: ["보드게임", "게임", "코딩"], steps: ["방탈출 카페|방탈출", "보드게임 카페|보드게임카페", "근처 맛집|맛집"], dur: "3~4시간", cost: 2, note: "같이 문제를 풀면 서로 성격이 보여요" },
+  { t: "라이브 공연 & 펍", m: ["fun", "culture"], tags: ["공연", "힙합", "음악", "기타"], steps: ["소극장·클럽 라이브 공연|라이브 공연", "수제맥주 펍|수제맥주"], dur: "3~4시간", cost: 2, drink: true, note: "좋아하는 장르를 미리 물어보고 고르세요" },
+  { t: "재즈바·LP바", m: ["culture", "cozy"], tags: ["음악", "피아노", "와인"], steps: ["저녁 식사|레스토랑", "재즈바·LP바|LP바"], dur: "3시간", cost: 3, drink: true, note: "음악이 있어 침묵도 어색하지 않아요" },
+  { t: "동네 맛집 탐방", m: ["food", "fun"], tags: ["맛집", "여행", "카페"], steps: ["줄 서는 동네 맛집|맛집", "시장 구경·길거리 음식|시장", "디저트 카페|디저트"], dur: "3시간", cost: 1, note: "각자 아는 맛집 하나씩 추천해서 고르기" },
+  { t: "레스토랑 & 와인바", m: ["food"], tags: ["와인", "요리", "맛집"], steps: ["분위기 좋은 레스토랑|레스토랑", "와인바|와인바"], dur: "3시간", cost: 3, drink: true, note: "특별한 날 애프터로 좋아요" },
+  { t: "포차 & 루프탑", m: ["fun"], tags: ["맥주", "와인", "맛집"], steps: ["포장마차|포차", "루프탑 바|루프탑"], dur: "3시간", cost: 2, drink: true, note: "평일 저녁 가볍게 한잔하기 좋아요" },
+  { t: "팝업스토어 & 쇼핑", m: ["light", "fun"], tags: ["쇼핑", "굿즈", "애니"], steps: ["요즘 뜨는 팝업스토어|팝업스토어", "쇼핑몰 구경|쇼핑몰", "푸드코트·맛집|맛집"], dur: "3시간", cost: 2, note: "서로 고른 물건으로 취향을 알 수 있어요" },
+  { t: "실내 낚시 카페", m: ["cozy", "fun"], tags: ["낚시"], steps: ["실내 낚시 카페|낚시카페", "근처 맛집|맛집"], dur: "2~3시간", cost: 1, note: "기다리는 동안 이야기 나누기 딱 좋아요" },
+  { t: "만화카페 & 게임", m: ["cozy", "light"], tags: ["애니", "게임", "드라마", "넷플릭스"], steps: ["만화카페|만화카페", "닌텐도·보드게임 카페|보드게임카페", "라면·분식|분식"], dur: "3시간", cost: 1, note: "집콕 취향끼리 편하게 놀기 좋아요" },
+];
+const COURSE_COST = ["", "1인 1~2만 원대", "1인 3~5만 원대", "1인 5만 원 이상"];
+// 점수 = 관심사 겹침 + 1.2 × 취향 좌표 가까움 + 생활 패턴 보정
+function courseScore(c, me, o, vec) {
+  const all = me.interests.concat(o.interests);
+  let s = 0;
+  for (const t of c.tags) {
+    const a = me.interests.includes(t), b = o.interests.includes(t);
+    if (a && b) s += 1;
+    else if (a || b) s += 0.3 * E.levelOf(a ? me : o, t);
+    else if (all.some(u => E.CAT_OF[u] === E.CAT_OF[t])) s += 0.1;
+  }
+  s += 1.2 * E.cosine(E.vecOfTags(c.tags), vec);
+  const both = (f, v) => me[f] === v && o[f] === v, either = (f, v) => me[f] === v || o[f] === v;
+  if (c.drink && either("drinking", "none")) s -= 1.5;
+  if (c.cost === 3 && either("spending", "saver")) s -= 0.4;
+  if (c.out && both("weekend", "home")) s -= 0.3;
+  if (c.out && both("weekend", "out")) s += 0.3;
+  if (c.m.includes("cozy") && both("weekend", "home")) s += 0.3;
+  return s;
+}
+function courseWhy(c, me, o) {
+  const common = c.tags.filter(t => me.interests.includes(t) && o.interests.includes(t));
+  if (common.length) return `둘 다 ${josa(common.join(", "), "을", "를")} 좋아해서`;
+  const mine = c.tags.find(t => me.interests.includes(t)), theirs = c.tags.find(t => o.interests.includes(t));
+  if (mine && theirs) return `내 ${mine} 취향과 ${o.nickname}님의 ${theirs} 취향을 섞어서`;
+  if (theirs) return `${o.nickname}님이 ${josa(theirs, "을", "를")} 좋아해서`;
+  if (mine) return `내가 좋아하는 ${mine} 취향에 맞춰서`;
+  return "두 분 취향 좌표와 가까운 코스";
+}
+function meetPlan(me, o, mood = "auto") {
   const mid = { lat: (me.lat + o.lat) / 2, lng: (me.lng + o.lng) / 2 };
   const near = REGIONS.map(r => ({ r: r[0], d: E.dist(mid, { lat: r[1], lng: r[2] }) })).sort((a, b) => a.d - b.d)[0].r;
   const area = near.replace(/^(서울|경기|인천) /, "");
-  const common = me.interests.filter(t => o.interests.includes(t));
-  const sameCat = me.interests.filter(t => !common.includes(t) && o.interests.some(u => E.CAT_OF[u] === E.CAT_OF[t]));
-  const favs = [...me.interests.filter(t => E.levelOf(me, t) === 3), ...o.interests.filter(t => E.levelOf(o, t) === 3)];
-  const places = [...new Set([...common, ...sameCat, ...favs, "카페"].map(t => PLACE[t] || "분위기 좋은 카페"))].slice(0, 3);
+  const ov = E.personVec(o), vec = E.personVec(me).map((x, i) => x + ov[i]);
   const both = (f, v) => me[f] === v && o[f] === v;
-  const time = both("chronotype", "morning") ? "주말 오전 11시" : both("chronotype", "night") ? "평일 저녁 7시" : "주말 오후 2시";
-  const why = common.length ? `둘 다 ${josa(common.join(", "), "을", "를")} 좋아해서` : sameCat.length ? `둘 다 ${josa(E.CAT_OF[sameCat[0]], "을", "를")} 좋아해서` : "처음 만나기 편한 곳으로";
-  return { near, area, places, time, why };
+  const courses = COURSES.filter(c => mood === "auto" || c.m.includes(mood))
+    .map(c => ({ ...c, score: courseScore(c, me, o, vec) })).sort((a, b) => b.score - a.score)
+    .map(c => ({ ...c, why: courseWhy(c, me, o),
+      time: c.dur === "하루" || c.dur === "반나절" ? "주말 오전 10시" : c.drink ? "금요일 저녁 7시" : c.out ? (both("chronotype", "night") ? "주말 오후 2시" : "주말 오전 11시")
+        : both("chronotype", "night") ? "평일 저녁 7시" : both("chronotype", "morning") ? "주말 오전 11시" : "주말 오후 2시" }));
+  return { near, area, courses, noDrink: me.drinking === "none" || o.drinking === "none" };
 }
 function planCard(me, o) {
-  const pl = meetPlan(me, o);
-  if (!S.planOpen) return `<div class="plan"><div class="sig-head"><b class="h">약속 잡기 도우미</b><button class="btn sm" data-act="planopen">장소 추천 보기</button></div><span class="muted" style="font-size:13px">두 분 모두 만나고 싶어해요. 중간 지점인 ${esc(pl.area)} 근처에서 골라드릴게요.</span></div>`;
-  return `<div class="plan"><div class="sig-head"><b class="h">약속 잡기 도우미</b><button class="btn line sm" data-act="planopen">접기</button></div>
-    <span style="font-size:14px">두 분 사이 중간 지점은 <b>${esc(pl.area)}</b> 근처예요. ${esc(pl.why)} 이런 곳은 어때요?</span>
-    ${pl.places.map((place, i) => `<div class="plan-opt"><span><b>${esc(place)}</b> · ${esc(pl.time)}</span><span style="display:flex;gap:8px;align-items:center">
-      <a href="https://map.naver.com/p/search/${encodeURIComponent(pl.area + " " + place)}" target="_blank" rel="noopener">지도에서 보기</a>
-      <button class="btn sm" data-act="propose" data-i="${i}">제안 보내기</button></span></div>`).join("")}
+  const meet = wantsMeet(sigOf(me.id, o.id)?.kind) && wantsMeet(sigOf(o.id, me.id)?.kind);
+  const title = meet ? "약속 잡기 도우미" : "데이트 코스 추천";
+  const pl = meetPlan(me, o, S.planMood);
+  if (!S.planOpen) return `<div class="plan"><div class="sig-head"><b class="h">${title}</b><button class="btn sm" data-act="planopen">코스 추천 보기</button></div><span class="muted" style="font-size:13px">${meet ? "두 분 모두 만나고 싶어해요. " : ""}두 분 취향에 맞춰 중간 지점인 ${esc(pl.area)} 근처 데이트 코스를 골라드릴게요.</span></div>`;
+  const per = 3, pages = Math.max(1, Math.ceil(pl.courses.length / per)), page = S.planPage % pages;
+  const shown = pl.courses.slice(page * per, page * per + per);
+  return `<div class="plan"><div class="sig-head"><b class="h">${title}</b><button class="btn line sm" data-act="planopen">접기</button></div>
+    <span style="font-size:14px">중간 지점 <b>${esc(pl.area)}</b> 근처로 골랐어요. 어떤 데이트가 끌려요?</span>
+    <div class="tabs2" role="tablist" aria-label="데이트 분위기">${MOODS.map(([k, label]) => `<button role="tab" aria-selected="${S.planMood === k}" data-act="planmood" data-v="${k}">${label}</button>`).join("")}</div>
+    <div class="course-list">${shown.map((c, i) => `<div class="course">
+      <div class="course-head"><b>${esc(c.t)}</b><span class="muted">${esc(c.dur)} · ${COURSE_COST[c.cost]}</span></div>
+      <span class="course-why">${esc(c.why)}</span>
+      <ol class="course-steps">${c.steps.map(st => { const [label, q] = st.split("|");
+        return `<li>${q ? `<a href="https://map.naver.com/p/search/${encodeURIComponent(pl.area + " " + q)}" target="_blank" rel="noopener">${esc(label)}</a>` : esc(label)}</li>`; }).join("")}</ol>
+      <span class="muted" style="font-size:12px">${esc(c.note)}</span>
+      <div class="course-foot"><span style="font-size:13px">추천 시간 · ${esc(c.time)}</span><button class="btn sm" data-act="propose" data-i="${page * per + i}">이 코스 제안하기</button></div>
+    </div>`).join("")}</div>
+    <div class="course-foot">${pl.noDrink ? `<span class="muted" style="font-size:12px">술을 안 마시는 분이 있어 술자리 코스는 뒤로 보냈어요</span>` : "<span></span>"}${pages > 1 ? `<button class="btn line sm" data-act="planmore">다른 코스 보기 (${page + 1}/${pages})</button>` : ""}</div>
   </div>`;
 }
 
@@ -1471,7 +1553,7 @@ function chatView(me) {
     <div class="sheet full${S.enter ? " enter" : ""}">
       <div class="sheet-head pad"><button class="icon-btn" data-act="closechat" aria-label="뒤로">${ICON.back}</button>${photo(o, "av")}<b>${esc(o.nickname)}${vb(o)}</b>
         <button class="btn line sm" data-act="open" data-id="${o.id}">프로필</button><button class="icon-btn" data-act="menu" data-id="${o.id}" aria-label="차단·신고 메뉴">${ICON.dots}</button></div>
-      ${ok ? `<div class="pad" style="padding-block:10px 0;display:flex;flex-direction:column;gap:8px">${signalPanel(me, o, true)}${wantsMeet(sigOf(me.id, o.id)?.kind) && wantsMeet(sigOf(o.id, me.id)?.kind) ? planCard(me, o) : ""}</div>` : ""}
+      ${ok ? `<div class="pad" style="padding-block:10px 0;display:flex;flex-direction:column;gap:8px">${signalPanel(me, o, true)}${planCard(me, o)}</div>` : ""}
       <div class="log pad" id="chat-log">${hint ? `<div class="notice" style="font-size:13px">${hint}</div>` : ""}
         ${log || `<div class="empty">${EMPTY_ART}<b>${esc(o.nickname)}님과 매칭됐어요</b>공통 관심사로 먼저 말을 걸어보세요.</div>`}</div>
       ${ok ? `<form class="composer pad" id="chat-form"><label class="attach" title="사진 보내기">${ICON.clip}<input type="file" id="chat-photo" accept="image/*" aria-label="사진 보내기"></label><input type="text" id="chat-input" placeholder="메시지 보내기" maxlength="500" autocomplete="off"><button class="btn sm" type="submit">보내기</button></form>`
@@ -1671,7 +1753,7 @@ document.addEventListener("click", e => {
     case "open": S.detail = id; render(); break;
     case "close": S.detail = null; render(); break;
     case "openchat": S.chat = id; S.detail = null; S.sigOpen = false; render(); break;
-    case "closechat": S.chat = null; S.sigOpen = false; S.planOpen = false; render(); break;
+    case "closechat": S.chat = null; S.sigOpen = false; S.planOpen = false; S.planMood = "auto"; S.planPage = 0; render(); break;
     case "lightbox": { const im = S.imgs[t.dataset.img]; if (im) { S.lightbox = im.src; render(); } break; }
     case "closelb": S.lightbox = null; render(); break;
     case "sigopen": S.sigOpen = !S.sigOpen; render(); break;
@@ -1718,8 +1800,11 @@ document.addEventListener("click", e => {
     case "legal": S.legal = t.dataset.v; render(); break;
     case "closelegal": S.legal = null; render(); break;
     case "planopen": S.planOpen = !S.planOpen; render(); break;
-    case "propose": { const o = world().byId[S.chat]; if (!o) break; const pl = meetPlan(world().byId[me], o), place = pl.places[+t.dataset.i];
-      sendMsg(pk(me, o.id), me, `[약속 제안] ${pl.area} 근처 ${place}에서 ${pl.time} 어때요?`); S.planOpen = false; toast("약속을 제안했어요"); break; }
+    case "planmood": S.planMood = t.dataset.v; S.planPage = 0; render(); break;
+    case "planmore": S.planPage++; render(); break;
+    case "propose": { const o = world().byId[S.chat]; if (!o) break; const pl = meetPlan(world().byId[me], o, S.planMood), c = pl.courses[+t.dataset.i]; if (!c) break;
+      const route = c.steps.map(st => st.split("|")[0]).join(" → ");
+      sendMsg(pk(me, o.id), me, `[데이트 제안] ${pl.area} 근처에서 '${c.t}' 코스 어때요? ${route} · ${c.time}`); S.planOpen = false; toast("데이트 코스를 제안했어요"); break; }
     case "adminopen": S.admin = true; S.adminTab = "stats"; render(); break;
     case "closeadmin": S.admin = false; render(); break;
     case "admtab": S.adminTab = t.dataset.v; render(); break;
