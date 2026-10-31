@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>궁합 리포트 · 둘 디자인 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3F43C4}a:hover{color:#2D3098}
+</style>
+<style>html{background:#E9E8F7}body>div{margin:0 auto}</style>
+</head>
+<body>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFFFF; font-family: 'Noto Sans KR', sans-serif; color: #1F2147; display: flex; flex-direction: column; overflow: hidden">
+
+  <div style="display: flex; align-items: center; gap: 4px; padding: 14px 12px 4px 8px">
+    <a href="home.html" aria-label="뒤로" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1F2147">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>
+    </a>
+    <div style="width: 36px; height: 36px; border-radius: 18px; background: #E7E6FB; color: #5B5FE0; display: flex; align-items: center; justify-content: center" role="img" aria-label="프로필 사진 자리">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+    </div>
+    <span style="font-size: 20px; font-weight: 800; margin-left: 6px">[이름]님과의 궁합</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 16px; padding: 12px 20px 20px 20px">
+    <a href="survey.html" style="background: #EEF0FF; border-radius: 20px; padding: 16px 18px; display: flex; align-items: center; gap: 12px; text-decoration: none">
+      <div style="display: flex; flex-direction: column; gap: 3px; flex-grow: 1">
+        <span style="font-size: 16px; font-weight: 700; color: #3F43C4">추천 기준 바꾸기 ›</span>
+        <span style="font-size: 13px; color: #4A4D6E">목적에 맞게 항목별 비중을 정할 수 있어요</span>
+      </div>
+      <div style="width: 52px; height: 52px; border-radius: 16px; background: #FFFFFF; color: #5B5FE0; display: flex; align-items: center; justify-content: center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>
+      </div>
+    </a>
+
+    <div style="border: 1.5px solid #ECEBF7; border-radius: 24px; overflow: hidden">
+      <div style="padding: 18px 18px 8px 18px; display: flex; flex-direction: column; align-items: center">
+        <span style="align-self: flex-start; font-size: 14px; font-weight: 700; color: #4A4D6E">양방향 궁합 점수</span>
+        <div style="position: relative; width: 240px; height: 150px">
+          <svg width="240" height="140" viewBox="0 0 240 140" fill="none" role="img" aria-label="궁합 점수 100점 중 92점">
+            <path d="M20 120 A100 100 0 0 1 220 120" stroke="#ECEBFA" stroke-width="16" stroke-linecap="round"></path>
+            <path d="M20 120 A100 100 0 0 1 216.86 95.13" stroke="#5B5FE0" stroke-width="16" stroke-linecap="round"></path>
+            <circle cx="216.86" cy="95.13" r="9" fill="#FFFFFF" stroke="#5B5FE0" stroke-width="5"></circle>
+          </svg>
+          <div style="position: absolute; left: 0; right: 0; top: 54px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+            <span style="font-size: 12px; color: #6B6E8F">서로 1순위 · 궁합 S</span>
+            <span style="font-size: 44px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.05">92<span style="font-size: 20px; font-weight: 700">점</span></span>
+          </div>
+          <span style="position: absolute; left: 14px; bottom: 0; font-size: 12px; color: #6B6E8F">0</span>
+          <span style="position: absolute; right: 8px; bottom: 0; font-size: 12px; color: #6B6E8F">100</span>
+        </div>
+        <span style="margin-top: 8px; font-size: 13px; font-weight: 700; color: #A3214F; background: #FFE6EF; padding: 7px 14px; border-radius: 999px">AI가 설명하는 우리 둘 ›</span>
+      </div>
+      <div style="background: #FAFAFF; border-top: 1.5px solid #ECEBF7; padding: 14px 18px; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; font-size: 14px">
+        <span style="color: #4A4D6E"><span style="color: #3F43C4; font-weight: 700">내가</span> 본 점수</span>
+        <span style="font-weight: 700">94점</span>
+        <span style="color: #4A4D6E"><span style="color: #A3214F; font-weight: 700">상대가</span> 본 점수</span>
+        <span style="font-weight: 700">90점</span>
+        <span style="color: #6B6E8F; font-size: 12px">두 점수를 곱해 제곱근 · 한쪽만 높으면 낮아져요</span>
+        <span></span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 4px 0 0 0; font-size: 18px; font-weight: 800">함께 하기 좋은 것</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <span style="width: 66px; height: 66px; border-radius: 20px; background: #FFFFFF; border: 1.5px solid #ECEBF7; box-shadow: 0 4px 12px rgba(91,95,224,0.07); color: #5B5FE0; display: flex; align-items: center; justify-content: center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-5-5L5 21"></path></svg>
+          </span>
+          <span style="font-size: 13px">전시회</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <span style="width: 66px; height: 66px; border-radius: 20px; background: #FFFFFF; border: 1.5px solid #ECEBF7; box-shadow: 0 4px 12px rgba(91,95,224,0.07); color: #D6336C; display: flex; align-items: center; justify-content: center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 0 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"></path><path d="M6 2v2M10 2v2M14 2v2"></path></svg>
+          </span>
+          <span style="font-size: 13px">카페</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <span style="width: 66px; height: 66px; border-radius: 20px; background: #FFFFFF; border: 1.5px solid #ECEBF7; box-shadow: 0 4px 12px rgba(91,95,224,0.07); color: #5B5FE0; display: flex; align-items: center; justify-content: center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22v-6"></path><path d="M12 2 6 11h3l-3 5h12l-3-5h3z"></path></svg>
+          </span>
+          <span style="font-size: 13px">한강 산책</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <span style="width: 66px; height: 66px; border-radius: 20px; background: #FFFFFF; border: 1.5px solid #ECEBF7; box-shadow: 0 4px 12px rgba(91,95,224,0.07); color: #D6336C; display: flex; align-items: center; justify-content: center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2"></rect><path d="M7 3v18M17 3v18M2 8h5M2 16h5M17 8h5M17 16h5"></path></svg>
+          </span>
+          <span style="font-size: 13px">영화</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a href="chat.html" style="margin: auto 20px 26px 20px; height: 56px; border-radius: 18px; background: #5B5FE0; color: #FFFFFF; font-size: 17px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    대화하기
+  </a>
+</div>
+</body>
+</html>
