@@ -27,6 +27,17 @@ service cloud.firestore {
       allow create, update: if member() && request.resource.data.from == me() && id == me() + '_' + request.resource.data.to;
       allow delete: if member() && resource.data.from == me();
     }
+    // 애프터 체크: 만난 뒤 "또 만나고 싶어요?" 답. 내 답은 나만 읽음.
+    // 상대는 '내 답도 yes이고 자기 답도 yes'일 때만 읽을 수 있음 → 둘 다 예일 때만 서로 알게 됨
+    // (상대 문서가 없거나 no면 읽기가 막혀서, '아직 안 답함'과 '아니요'를 구분할 수 없음)
+    match /afters/{id} {
+      allow read: if member() && (resource.data.from == me()
+                    || (resource.data.to == me() && resource.data.ans == 'yes'
+                        && get(/databases/$(database)/documents/afters/$(me() + '_' + resource.data.from)).data.ans == 'yes'));
+      allow create, update: if member() && request.resource.data.from == me() && id == me() + '_' + request.resource.data.to
+                            && request.resource.data.ans in ['yes', 'no'];
+      allow delete: if member() && resource.data.from == me();
+    }
     match /chats/{id} {
       allow read: if member() && me() in resource.data.pair;
       allow create: if member() && me() in request.resource.data.pair && request.resource.data.pair.size() == 2

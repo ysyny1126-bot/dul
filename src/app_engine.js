@@ -265,5 +265,18 @@ function createEngine(cfg) {
     };
   }
 
-  return { computeAll, explain, countFor, itemSims, baseWeights, effWeights, KEYS, LABEL, W0, tagSim, dist, CAT_OF, levelOf, vecOfTags, personVec, cosine, project2D, AXES: cfg.axes };
+  // "만약에" 시뮬레이터: 내 가중치만 바꿔서 내 추천 순위를 다시 계산
+  // 상대가 본 내 점수(ba)와 인기 보정(pop)은 내 가중치와 상관없으니 그대로 씀 → 내 쪽 점수만 새로 계산
+  function rescore(ctx, me, recs, byId, Wraw) {
+    const W = normWeights(Wraw);
+    const va = ctx.VEC[me.id] || personVec(me);
+    return recs.map(r => {
+      const b = byId[r.id];
+      const ab = scoreOne(me, b, r.distance, W, ctx.rarity, va, ctx.VEC[b.id] || personVec(b), false).total;
+      const raw = Math.sqrt(ab * r.ba);
+      return { ...r, ab, raw, score: raw * (r.pop ?? 1) };
+    }).sort((x, y) => (y.score - x.score) || (x.distance - y.distance));
+  }
+
+  return { computeAll, explain, countFor, itemSims, rescore, normWeights, baseWeights, effWeights, KEYS, LABEL, W0, tagSim, dist, CAT_OF, levelOf, vecOfTags, personVec, cosine, project2D, AXES: cfg.axes };
 }
