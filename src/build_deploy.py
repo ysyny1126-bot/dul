@@ -21,7 +21,7 @@ head = f'''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>둘 - 동네친구, 데이트, 새로운 시작</title>
 <meta name="description" content="둘 - 동네친구, 데이트, 새로운 시작. 취향이 가까운 사람을 찾아주는 매칭 앱">
-<meta name="theme-color" content="#FDE6EE">
+<meta name="theme-color" content="#F4F3FF">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z' fill='%23FF6F9C'/%3E%3C/svg%3E">
 <style>
 :root {{ padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }}
