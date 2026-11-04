@@ -146,7 +146,7 @@ a { color: inherit; }
   </div>
   <a class="pill" href="demo.html">
     <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 3.2 4.5 6.9 4.5c2.1 0 3.6 1.1 5.1 2.9 1.5-1.8 3-2.9 5.1-2.9 3.7 0 6 3.7 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg></span>
-    <span><b>가상 회원 500명</b><span>시연판에서 직접 써보기</span></span><span class="go">›</span></a>
+    <span><b>가상 회원 10명</b><span>시연판에서 직접 써보기</span></span><span class="go">›</span></a>
 </section>
 
 <section class="sheet" id="s1" data-shot="auth">
@@ -273,7 +273,7 @@ a { color: inherit; }
 // 저장소(localStorage)는 건드리지 않게 메모리로 바꿔둬요.
 const PRE = `(function(){var mem={};ls.get=function(k,d){return k in mem?mem[k]:d};ls.set=function(k,v){mem[k]=v};
   document.documentElement.dataset.theme="light";S.dev=false;S.intro=false;S.notifOpen=false;S.legal=null;S.hot=null;S.celebrate=null;S.chat=null;S.detail=null;S.sim=null;})();
-  var ME=BASE.showcase[0], O=(matchesOf(ME)[0]||{}).id;`;
+  var ME=(BASE.showcase||[])[0]||"1", O=(matchesOf(ME)[0]||{}).id;`;
 const SHOTS = {
   auth: `S.uid=null;S.authTab="login";render();`,
   home: `S.uid=ME;S.tab="home";render();`,
