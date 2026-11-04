@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>둘 시연판 - 가상 회원 500명</title>
 <meta name="description" content="둘 - 동네친구, 데이트, 새로운 시작. 취향이 가까운 사람을 찾아주는 매칭 앱">
-<meta name="theme-color" content="#F4F3FF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#15172F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="demo.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -69,62 +69,69 @@ img { max-width: 100%; }
 <style>
 /* Layout: 라벤더빛 바탕 위에 둥근 흰 카드. 주요 버튼·강조는 인디고 파스텔, 좋아요·고른 것은 파스텔 핑크. 선은 얇게, 그림자는 부드럽게. 로고만 필기체 */
 :root {
-  --bg: #ECEBFA;
-  --bg-grad: linear-gradient(165deg, #F1F0FF 0%, #ECEBFA 55%, #FCEFF4 100%);
-  --hero-grad: linear-gradient(180deg, #5B5FE0 0%, #7A7EEA 45%, #B7A6EE 75%, #F6C3D5 100%);
-  --app: #F7F6FF;
+  --bg: #F2F2F7;
+  --bg-grad: none;
+  --hero-grad: linear-gradient(180deg, #1C1C1E 0%, #2C2C2E 55%, #5A3A4C 100%);
+  --app: #F2F2F7;
   --surface: #FFFFFF;
-  --paper: #F8F8FF;
-  --ink: #1F2147;
-  --muted: #64678A;
-  --line: #E6E5F5;
-  --stroke: #D5D4F0;
-  --rose: #5B5FE0;
-  --accent: #5B5FE0;
+  --paper: #F7F7FA;
+  --ink: #111216;
+  --muted: #6E6E73;
+  --line: #E5E5EA;
+  --stroke: #D1D1D6;
+  --rose: #111216;
+  --accent: #111216;
   --accent-ink: #FFFFFF;
-  --accent-soft: #EEEDFB;
-  --heart: #D6336C;
-  --heart-soft: #FFE3EC;
-  --pink: #FFD3E2;
-  --pink-ink: #A3214F;
-  --mint: #8E91EE;
-  --mint-deep: #3F43C4;
-  --accent2: #4A4ED0;
-  --accent2-soft: #EEEDFB;
-  --lilac: #E7E6FB;
-  --strip: #F6F5FF;
-  --chip: #F1F0FC;
-  --bubble-me: #FFD3E2;
-  --bubble-them: #F0EFFA;
-  --good: #1E7F53;
-  --bad: #C93469;
-  --bad-soft: #FFE6EF;
-  --scrim: rgba(31, 33, 71, .38);
-  --shadow: 0 6px 24px rgba(91, 95, 224, .12);
-  --shadow-btn: 0 6px 16px rgba(91, 95, 224, .30);
+  --accent-soft: #EDEDF0;
+  --heart: #FF2D55;
+  --heart-soft: #FFE5EA;
+  --pink: #FFD6DF;
+  --pink-ink: #B0163A;
+  --mint: #8E8E93;
+  --mint-deep: #111216;
+  --accent2: #111216;
+  --accent2-soft: #EDEDF0;
+  --lilac: #EDEDF0;
+  --strip: #F7F7FA;
+  --chip: #F2F2F7;
+  --bubble-me: #111216;
+  --bubble-me-ink: #FFFFFF;
+  --bubble-them: #FFFFFF;
+  --good: #1E8E4E;
+  --bad: #D70015;
+  --bad-soft: #FFE5E7;
+  --scrim: rgba(0, 0, 0, .32);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 6px 20px rgba(0, 0, 0, .05);
+  --shadow-btn: 0 6px 16px rgba(0, 0, 0, .18);
+  --tab: #111216;
+  --tab-ink: rgba(255, 255, 255, .62);
+  --tab-on: #FFFFFF;
+  --tab-on-ink: #111216;
   --font-logo: "Dancing Script", cursive;
-  --font-display: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-hand: var(--font-display);
   --font-body: var(--font-display);
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0F1024; --bg-grad: linear-gradient(165deg, #14152E 0%, #121331 55%, #1E1428 100%); --hero-grad: linear-gradient(180deg, #2E3190 0%, #45479E 50%, #6A4E8E 80%, #8A4F6E 100%);
-    --app: #15172F; --surface: #1F2245; --paper: #1B1D3D; --ink: #ECEBFF; --muted: #A9ABD0; --line: #2F3260;
-    --stroke: #43478A; --rose: #A3A6FF; --accent: #A3A6FF; --accent-ink: #12132A; --accent-soft: #2A2D5A; --heart: #FF8DB5; --heart-soft: #44263C;
-    --pink: #5A2C45; --pink-ink: #FFC2D6; --mint: #8E91EE; --mint-deep: #C3C5FF; --accent2: #C3C5FF; --accent2-soft: #2A2D5A; --lilac: #2A2D5A; --strip: #23264D; --chip: #272A52;
-    --bubble-me: #5A2C45; --bubble-them: #262950;
-    --good: #7FD4A4; --bad: #FF8FA8; --bad-soft: #4A2634; --scrim: rgba(0, 0, 0, .55); --shadow: 0 8px 24px rgba(0, 0, 0, .35); --shadow-btn: 0 6px 16px rgba(0, 0, 0, .35); color-scheme: dark;
+    --bg: #000000; --bg-grad: none; --hero-grad: linear-gradient(180deg, #2C2C2E 0%, #1C1C1E 55%, #4A2C3C 100%);
+    --app: #000000; --surface: #1C1C1E; --paper: #2C2C2E; --ink: #F5F5F7; --muted: #98989F; --line: #2C2C2E;
+    --stroke: #3A3A3C; --rose: #F5F5F7; --accent: #F5F5F7; --accent-ink: #000000; --accent-soft: #2C2C2E; --heart: #FF375F; --heart-soft: #3A1A24;
+    --pink: #4A2230; --pink-ink: #FFB3C4; --mint: #8E8E93; --mint-deep: #F5F5F7; --accent2: #F5F5F7; --accent2-soft: #2C2C2E; --lilac: #2C2C2E; --strip: #1C1C1E; --chip: #2C2C2E;
+    --bubble-me: #F5F5F7; --bubble-me-ink: #000000; --bubble-them: #1C1C1E;
+    --good: #30D158; --bad: #FF6961; --bad-soft: #3A1E1E; --scrim: rgba(0, 0, 0, .6); --shadow: none; --shadow-btn: none;
+    --tab: #1C1C1E; --tab-ink: rgba(255, 255, 255, .6); --tab-on: #F5F5F7; --tab-on-ink: #000000; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0F1024; --bg-grad: linear-gradient(165deg, #14152E 0%, #121331 55%, #1E1428 100%); --hero-grad: linear-gradient(180deg, #2E3190 0%, #45479E 50%, #6A4E8E 80%, #8A4F6E 100%);
-  --app: #15172F; --surface: #1F2245; --paper: #1B1D3D; --ink: #ECEBFF; --muted: #A9ABD0; --line: #2F3260;
-  --stroke: #43478A; --rose: #A3A6FF; --accent: #A3A6FF; --accent-ink: #12132A; --accent-soft: #2A2D5A; --heart: #FF8DB5; --heart-soft: #44263C;
-  --pink: #5A2C45; --pink-ink: #FFC2D6; --mint: #8E91EE; --mint-deep: #C3C5FF; --accent2: #C3C5FF; --accent2-soft: #2A2D5A; --lilac: #2A2D5A; --strip: #23264D; --chip: #272A52;
-  --bubble-me: #5A2C45; --bubble-them: #262950;
-  --good: #7FD4A4; --bad: #FF8FA8; --bad-soft: #4A2634; --scrim: rgba(0, 0, 0, .55); --shadow: 0 8px 24px rgba(0, 0, 0, .35); --shadow-btn: 0 6px 16px rgba(0, 0, 0, .35); color-scheme: dark;
+  --bg: #000000; --bg-grad: none; --hero-grad: linear-gradient(180deg, #2C2C2E 0%, #1C1C1E 55%, #4A2C3C 100%);
+    --app: #000000; --surface: #1C1C1E; --paper: #2C2C2E; --ink: #F5F5F7; --muted: #98989F; --line: #2C2C2E;
+    --stroke: #3A3A3C; --rose: #F5F5F7; --accent: #F5F5F7; --accent-ink: #000000; --accent-soft: #2C2C2E; --heart: #FF375F; --heart-soft: #3A1A24;
+    --pink: #4A2230; --pink-ink: #FFB3C4; --mint: #8E8E93; --mint-deep: #F5F5F7; --accent2: #F5F5F7; --accent2-soft: #2C2C2E; --lilac: #2C2C2E; --strip: #1C1C1E; --chip: #2C2C2E;
+    --bubble-me: #F5F5F7; --bubble-me-ink: #000000; --bubble-them: #1C1C1E;
+    --good: #30D158; --bad: #FF6961; --bad-soft: #3A1E1E; --scrim: rgba(0, 0, 0, .6); --shadow: none; --shadow-btn: none;
+    --tab: #1C1C1E; --tab-ink: rgba(255, 255, 255, .6); --tab-on: #F5F5F7; --tab-on-ink: #000000; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -136,7 +143,7 @@ b { font-weight: 700; }
 .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 
-#app { max-width: 520px; min-height: 100%; margin: 0 auto; background: var(--app); position: relative; display: flex; flex-direction: column; box-shadow: 0 0 60px rgba(91, 95, 224, .10); }
+#app { max-width: 520px; min-height: 100%; margin: 0 auto; background: var(--app); position: relative; display: flex; flex-direction: column; box-shadow: none; }
 .pad { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
 /* 로고: 하트 + 필기체 dul */
@@ -200,7 +207,7 @@ main { flex: 1; padding-block: 8px 108px; display: flex; flex-direction: column;
 .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ph .ini { font-weight: 800; color: #FFFFFF; opacity: .95; }
 .ph.noimg { background: linear-gradient(150deg, #C9B8F2, #F5A9C2); }
-.av { width: 46px; height: 46px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--surface), 0 2px 8px rgba(91, 95, 224, .2); }
+.av { width: 46px; height: 46px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--surface); }
 .av .ini { font-size: 18px; }
 .av.mini { width: 32px; height: 32px; }
 .av.mini .ini { font-size: 13px; }
@@ -344,7 +351,7 @@ tr.pen td { color: var(--bad); }
 /* 채팅 */
 .log { flex: 1; overflow-y: auto; padding-block: 14px; display: flex; flex-direction: column; gap: 6px; }
 .msg { max-width: 78%; padding: 10px 14px; border-radius: 20px; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.me { align-self: flex-end; background: var(--bubble-me); color: var(--ink); border-bottom-right-radius: 6px; }
+.msg.me { align-self: flex-end; background: var(--bubble-me); color: var(--bubble-me-ink); border-bottom-right-radius: 6px; }
 .msg.them { align-self: flex-start; background: var(--bubble-them); border-bottom-left-radius: 6px; }
 /* 상대 메시지는 프로필 사진과 같은 줄에 */
 .msg-row { align-self: flex-start; display: flex; align-items: flex-end; gap: 8px; max-width: 86%; }
@@ -462,7 +469,7 @@ tr.pen td { color: var(--bad); }
 .tier-items li small { grid-column: 1 / -1; font-size: 12px; color: var(--heart); }
 /* ---------- 움직이는 배경 (WebGL) ---------- */
 #bg-gl { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-html.gl #app { background: color-mix(in srgb, var(--app) 52%, transparent); box-shadow: none; }
+html.gl #app { background: var(--app); box-shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 20px 60px rgba(0, 0, 0, .18); }
 .typing { display: flex; gap: 4px; padding: 14px; }
 .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite; }
 .typing i:nth-child(2) { animation-delay: .2s; }
@@ -475,7 +482,7 @@ html.gl #app { background: color-mix(in srgb, var(--app) 52%, transparent); box-
 @media (prefers-reduced-motion: reduce) { .anim .celeb-tag, .anim .celeb-photo, .anim .celeb-score, .anim .celeb-kw, .anim .celeb-go, .anim .celeb-shine::after { animation: none; } }
 
 /* ---------- 취향 핫플 지도 ---------- */
-.hot-entry { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 0; cursor: pointer; border-radius: 20px; padding: 12px 14px; color: #FFFFFF; background: linear-gradient(120deg, #5B5FE0, #9C7BEA 60%, #F08DB0); box-shadow: 0 8px 20px rgba(91, 95, 224, .28); flex: none; }
+.hot-entry { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 0; cursor: pointer; border-radius: 20px; padding: 12px 14px; color: #FFFFFF; background: var(--tab); box-shadow: var(--shadow-btn); flex: none; }
 .hot-entry .ico { width: 42px; height: 42px; border-radius: 14px; background: rgba(255, 255, 255, .22); display: grid; place-items: center; font-size: 22px; flex: none; }
 .hot-entry .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .hot-entry b { font-size: 16px; }
@@ -486,10 +493,10 @@ html.gl #app { background: color-mix(in srgb, var(--app) 52%, transparent); box-
 .map-off { display: grid; place-items: center; height: 100%; padding: 20px; text-align: center; font-size: 14px; color: #64678A; }
 .mpin { display: grid; place-items: center; font-weight: 800; color: #FFFFFF; }
 .mpin.who { width: 30px; height: 30px; border-radius: 50%; border: 3px solid #FFFFFF; font-size: 13px; box-shadow: 0 2px 8px rgba(0, 0, 0, .25); }
-.mpin.me { background: #5B5FE0; }
+.mpin.me { background: #111216; }
 .mpin.them { background: #E0679A; }
-.mpin.spot { width: 42px; height: 42px; border-radius: 50%; background: #FFFFFF; border: 2.5px solid #5B5FE0; font-size: 20px; position: relative; box-shadow: 0 4px 12px rgba(31, 33, 71, .3); transition: transform .15s; }
-.mpin.spot b { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; border-radius: 10px; background: #5B5FE0; color: #FFFFFF; font-size: 11px; display: grid; place-items: center; }
+.mpin.spot { width: 42px; height: 42px; border-radius: 50%; background: #FFFFFF; border: 2.5px solid #111216; font-size: 20px; position: relative; box-shadow: 0 4px 12px rgba(31, 33, 71, .3); transition: transform .15s; }
+.mpin.spot b { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; border-radius: 10px; background: #111216; color: #FFFFFF; font-size: 11px; display: grid; place-items: center; }
 .mpin.spot.on { transform: scale(1.3); border-color: #E0679A; }
 .mpin.spot.on b { background: #E0679A; }
 .hot-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); padding-block: 10px 0; }
@@ -673,7 +680,7 @@ button, a, label, select, summary, [data-act] { touch-action: manipulation; }   
 .ai-wait::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: aidots 1.2s steps(4) infinite; }
 @keyframes aidots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
 .ai-list { display: flex; flex-direction: column; gap: 6px; }
-.ai-cand { text-align: left; border: 1px solid transparent; background: var(--surface); border-radius: 999px; padding: 10px 16px; box-shadow: 0 2px 8px rgba(91, 95, 224, .08); cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.ai-cand { text-align: left; border: 1px solid transparent; background: var(--surface); border-radius: 999px; padding: 10px 16px; box-shadow: var(--shadow); cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .ai-cand:hover { border-color: var(--stroke); }
 .ai-cand small { flex: none; color: var(--muted); font-size: 11px; }
 .ai-ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
@@ -741,6 +748,57 @@ button, a, label, select, summary, [data-act] { touch-action: manipulation; }   
 .mv.up { color: var(--good); }
 .mv.down { color: var(--bad); }
 .sim-sum { font-size: 14px; font-weight: 700; }
+/* ---------- iOS 느낌: 회색 그룹 배경 + 흰 카드 + 검정 알약 ---------- */
+body { -webkit-font-smoothing: antialiased; }
+.bar { padding-block: 12px 10px; background: color-mix(in srgb, var(--app) 82%, transparent); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+.hello { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; cursor: pointer; text-align: left; min-width: 0; }
+.hello .av { width: 48px; height: 48px; box-shadow: none; }
+.hello > span { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.hello small { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hello b { font-size: 21px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap; }
+.bar-right { display: flex; gap: 8px; align-items: center; }
+.bell, .devsw { position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--surface); color: var(--ink); display: grid; place-items: center; padding: 0; cursor: pointer; box-shadow: var(--shadow); }
+.bell svg, .devsw svg { width: 21px; height: 21px; }
+.devsw { color: var(--muted); }
+.devsw[aria-pressed="true"] { background: var(--tab); color: var(--tab-on); }
+.dotb { position: absolute; top: 10px; right: 11px; width: 9px; height: 9px; border-radius: 50%; background: #FF3B30; box-shadow: 0 0 0 2px var(--surface); }
+main { padding-block: 6px 120px; gap: 14px; }
+.screen-title h2 { font-size: 30px; font-weight: 700; letter-spacing: -.03em; }
+.sec-title { display: flex; justify-content: space-between; align-items: center; padding: 8px 2px 0; }
+.sec-title h3 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+/* 오늘의 추천 알약 (레퍼런스의 에너지 사용량 바) */
+.today-pill { display: flex; align-items: center; gap: 14px; width: 100%; border: 0; border-radius: 999px; padding: 8px 20px 8px 8px; background: var(--tab); color: var(--tab-on); cursor: pointer; text-align: left; }
+.today-pill .ico { width: 48px; height: 48px; border-radius: 50%; background: var(--tab-on); color: var(--heart); display: grid; place-items: center; font-size: 20px; flex: none; }
+.today-pill .txt { flex: 1; display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+.today-pill b { font-size: 17px; font-weight: 600; }
+.today-pill small { font-size: 13px; opacity: .72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.today-pill svg { width: 20px; height: 20px; transform: rotate(180deg); flex: none; }
+/* 떠 있는 알약 탭바: 고른 탭만 흰 캡슐에 이름까지 */
+.tabbar { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: calc(100% - 40px); max-width: 360px; padding: 6px; border-radius: 999px; background: var(--tab); box-shadow: 0 10px 30px rgba(0, 0, 0, .22); display: flex; justify-content: space-between; gap: 4px; }
+.tabbar button { flex: 0 0 auto; flex-direction: row; gap: 7px; min-width: 52px; height: 52px; padding: 0 14px; border-radius: 999px; color: var(--tab-ink); font-size: 15px; justify-content: center; transition: background .2s, color .2s; }
+.tabbar button svg { width: 23px; height: 23px; }
+.tabbar button .tl { display: none; }
+.tabbar button[aria-current="true"] { background: var(--tab-on); color: var(--tab-on-ink); font-weight: 600; padding: 0 20px 0 16px; flex: 1 1 auto; }
+.tabbar button[aria-current="true"] svg { fill: none; stroke: var(--tab-on-ink); }
+.tabbar button[aria-current="true"] .tl { display: inline; }
+.tabbar .badge { top: 6px; left: auto; right: 6px; box-shadow: 0 0 0 2px var(--tab); background: #FF3B30; }
+/* 카드·버튼은 더 둥글고 평평하게 */
+.panel { border-radius: 28px; padding: 20px; }
+.btn { box-shadow: none; font-weight: 600; }
+.btn.alt { box-shadow: none; border-color: var(--line); }
+.btn.line { color: var(--ink); border-color: var(--stroke); }
+.chip { color: var(--ink); }
+.search input { border-color: transparent; }
+.sim-entry { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); border-radius: 28px; padding: 16px 18px; }
+.sim-entry b { color: var(--ink); }
+.sim-entry span { color: var(--muted); }
+.match-banner { background: var(--surface); border: 0; border-radius: 28px; }
+.seg { box-shadow: none; background: var(--line); padding: 3px; }
+.seg button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 2px 6px rgba(0, 0, 0, .12); }
+.auth form.f { border-radius: 28px; box-shadow: none; }
+.hero { border-radius: 32px; box-shadow: none; }
+.hero .logo span { text-shadow: none; }
+.msg.them { box-shadow: var(--shadow); }
 </style>
 
 <div id="app"></div>
@@ -1150,6 +1208,7 @@ const SKYLINE = `<svg viewBox="0 0 360 92" preserveAspectRatio="none" aria-hidde
 </svg>`;
 const EMPTY_ART = `<svg viewBox="0 0 120 80" aria-hidden="true"><g class="doodle"><path class="fillh" d="M60 22c-6-11-22-7-20 5 2 11 20 20 20 20s18-9 20-20c2-12-14-16-20-5z"/><path d="M26 64c22 6 46 6 68 0" stroke-dasharray="2 6"/><path d="M18 20v8M14 24h8M100 36v8M96 40h8"/></g></svg>`;
 const ICON = {
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
   match: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><circle cx="16" cy="10" r="2.6"/><path d="M3.5 19c.6-3 3-4.6 5.5-4.6s4.9 1.6 5.5 4.6M14.5 14.6c2.6-.4 4.9.9 5.6 4"/></svg>',
   chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z"/></svg>',
@@ -2243,7 +2302,7 @@ function hotView(me) {
       <div class="sheet-body" style="gap:0;padding-bottom:0">
         <div id="hot-map"></div>
         <div class="pad">
-          <div class="hot-legend"><span><i style="background:#5B5FE0"></i>나</span><span><i style="background:#E0679A"></i>${esc(o.nickname)}</span><span>숫자 핀 = 추천 핫플 (누르면 선택)</span></div>
+          <div class="hot-legend"><span><i style="background:#111216"></i>나</span><span><i style="background:#E0679A"></i>${esc(o.nickname)}</span><span>숫자 핀 = 추천 핫플 (누르면 선택)</span></div>
           <div class="hot-list">${picks.map((h, i) => `<article class="hot-card${i === sel ? " on" : ""}" data-act="hotsel" data-i="${i}">
             <div class="hot-row"><div class="hot-ico" aria-hidden="true">${h.e}<b>${page * 3 + i + 1}</b></div>
               <div class="hot-main"><b>${esc(h.n)}</b><span class="hot-line">${esc(h.line)}</span><span class="hot-why">♥ ${esc(h.why)}</span>
@@ -2429,11 +2488,12 @@ function shell() {
   const tabs = [["home", "추천", 0], ["match", "매칭", likedMe], ["chat", "채팅", unreadTotal], ["me", "내 정보", 0]];
   const body = { home: homeView, match: matchView, chat: chatListView, me: meView }[S.tab](me);
   const nNew = events(me).filter(e => e.at > notifSeen()).length;
-  return `<header class="bar pad">${LOGO}
-      <span class="bar-right"><button class="bell" data-act="notif" aria-label="알림${nNew ? ` ${nNew}개` : ""}">${ICON.bell}${nNew ? `<span class="badge">${nNew}</span>` : ""}</button>
-      <button class="devsw" data-act="dev" aria-pressed="${S.dev}" title="계산 과정을 보여줘요"><span class="track"></span>개발자 화면</button></span></header>
+  const h = new Date().getHours(), greet = h < 5 ? "편안한 밤이에요" : h < 11 ? "좋은 아침이에요" : h < 17 ? "좋은 오후예요" : h < 22 ? "좋은 저녁이에요" : "편안한 밤이에요";
+  return `<header class="bar pad"><button class="hello" data-act="tab" data-v="me" aria-label="내 정보">${photo(me, "av")}<span><small>안녕하세요, ${esc(me.nickname)}님 <span aria-hidden="true">👋</span></small><b>${greet}</b></span></button>
+      <span class="bar-right"><button class="devsw" data-act="dev" aria-pressed="${S.dev}" aria-label="개발자 화면" title="개발자 화면: 계산 과정을 보여줘요">${ICON.code}</button>
+      <button class="bell" data-act="notif" aria-label="알림${nNew ? ` ${nNew}개` : ""}">${ICON.bell}${nNew ? `<span class="dotb" aria-hidden="true"></span>` : ""}</button></span></header>
     <main class="pad">${body}</main>
-    <nav class="tabbar" aria-label="메뉴">${tabs.map(([k, l, n]) => `<button data-act="tab" data-v="${k}" aria-current="${S.tab === k}">${ICON[k]}${l}${n ? `<span class="badge">${n}</span>` : ""}</button>`).join("")}</nav>
+    <nav class="tabbar" aria-label="메뉴">${tabs.map(([k, l, n]) => `<button data-act="tab" data-v="${k}" aria-current="${S.tab === k}" aria-label="${l}">${ICON[k]}<span class="tl">${l}</span>${n ? `<span class="badge">${n}</span>` : ""}</button>`).join("")}</nav>
     ${S.admin ? adminView(me) : ""}
     ${S.chat ? chatView(me) : ""}
     ${S.detail ? detailView(me) : ""}
@@ -2489,9 +2549,10 @@ function homeView(me) {
       ${passed.length ? `<button class="btn line sm" data-act="unpass">넘긴 ${passed.length}명 다시 보기</button>` : ""}</div>` : "";
   const fewNote = recs.length && recs.length < REC_LIMIT ? relaxHtml(me, true) : "";
   const unpassNote = !doneNote && passed.length ? `<div class="daily-note"><button class="btn line sm" data-act="unpass">넘긴 ${passed.length}명 다시 보기</button></div>` : "";
-  return `${title}<span class="muted">${dayLabel} 오늘의 추천 · 내 등급 ${tierBadge(me)}${w.tierOn ? " · 비슷한 등급끼리 골랐어요" : ""}</span></div>${searchBar}
+  const t = tierOf(me);
+  return `<button class="today-pill" data-act="tab" data-v="me"><span class="ico" aria-hidden="true">♥</span><span class="txt"><b>오늘의 추천 ${shown.length}명</b><small>${dayLabel} · 내 등급 ${t.name}${w.tierOn ? " · 비슷한 등급끼리" : ""}</small></span>${ICON.back}</button>${searchBar}
     ${recs.length ? `<button class="sim-entry" data-act="simopen"><b>만약에?</b><span>관심사를 더 보면, 거리를 덜 보면… 순위가 어떻게 바뀌는지 미리 보기</span>${ICON.back}</button>` : ""}
-    ${top}${cards}${doneNote}${unpassNote}${fewNote}`;
+    ${top}${shown.length ? `<div class="sec-title"><h3>오늘의 추천</h3><span class="muted">${tierBadge(me)}</span></div>` : ""}${cards}${doneNote}${unpassNote}${fewNote}`;
 }
 function searchView(me) {
   const { tags, cats, via, qv, results, pool } = searchPeople(me, S.q);
@@ -3604,6 +3665,7 @@ if (window.visualViewport) {
 // 오로라처럼 천천히 흐르는 파스텔 빛 + 반짝이, 손가락이 닿는 곳에 빛이 따라옴. 게임 엔진 없이 셰이더 하나로 (몇 KB).
 // 화면 해상도의 절반으로 초당 30번까지만 그리고, 탭이 안 보이면 멈춤. '동작 줄이기' 설정이면 한 장만. WebGL이 없으면 원래 그라데이션.
 (function bgGL() {
+  if (matchMedia("(max-width: 560px)").matches) return;
   const cv = document.createElement("canvas"); cv.id = "bg-gl"; cv.setAttribute("aria-hidden", "true");
   let gl = null; try { gl = cv.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" }); } catch (e) {}
   if (!gl) return;
