@@ -272,7 +272,7 @@ a { color: inherit; }
 // 진짜 앱(demo.html)을 아이폰 틀 안에 띄우고, 화면마다 앱 상태를 바꿔서 보여줘요.
 // 저장소(localStorage)는 건드리지 않게 메모리로 바꿔둬요.
 const PRE = `(function(){var mem={};ls.get=function(k,d){return k in mem?mem[k]:d};ls.set=function(k,v){mem[k]=v};
-  document.documentElement.dataset.theme="light";S.dev=false;S.notifOpen=false;S.legal=null;S.hot=null;S.celebrate=null;S.chat=null;S.detail=null;S.sim=null;})();
+  document.documentElement.dataset.theme="light";S.dev=false;S.intro=false;S.notifOpen=false;S.legal=null;S.hot=null;S.celebrate=null;S.chat=null;S.detail=null;S.sim=null;})();
   var ME=BASE.showcase[0], O=(matchesOf(ME)[0]||{}).id;`;
 const SHOTS = {
   auth: `S.uid=null;S.authTab="login";render();`,

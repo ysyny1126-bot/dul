@@ -826,6 +826,43 @@ main { padding-block: 6px 120px; gap: 14px; }
 .hero { border-radius: 32px; box-shadow: none; }
 .hero .logo span { text-shadow: none; }
 .msg.them { box-shadow: var(--shadow); }
+.intro { position: fixed; inset: 0; z-index: 60; background: var(--app); display: flex; flex-direction: column; max-width: 520px; margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px)); animation: introIn .35s ease-out; }
+@keyframes introIn { from { opacity: 0; transform: scale(.98); } }
+.intro-top { display: flex; justify-content: space-between; align-items: center; }
+.intro-top .logo { align-items: flex-start; }
+.intro-skip { border: 0; background: none; color: var(--muted); font-size: 15px; padding: 8px 4px; cursor: pointer; }
+.intro-card { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; padding: 16px 4px 8px; min-height: 0; }
+.intro-card.swap { animation: introSwap .35s ease-out; }
+@keyframes introSwap { from { opacity: 0; transform: translateX(24px); } }
+.intro-demo { flex: 1; min-height: 200px; max-height: 440px; border-radius: 32px; background: var(--surface); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; margin-bottom: 14px; }
+.intro-k { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.intro-k i { font-style: normal; width: 28px; height: 28px; border-radius: 50%; background: var(--tab); color: var(--tab-on); display: grid; place-items: center; font-size: 13px; }
+.intro h2 { font-size: 32px; line-height: 1.2; font-weight: 700; letter-spacing: -.035em; }
+.intro p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+.intro-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; }
+.intro-dots { display: flex; gap: 6px; }
+.intro-dots i { width: 8px; height: 8px; border-radius: 4px; background: var(--stroke); transition: width .25s, background .25s; }
+.intro-dots i.on { width: 24px; background: var(--ink); }
+.intro-next { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; background: var(--tab); color: var(--tab-on); font-size: 17px; font-weight: 600; padding: 16px 26px; cursor: pointer; }
+.intro-next svg { width: 18px; height: 18px; transform: rotate(180deg); }
+/* 안내 카드 속 미리보기 */
+.i-score { display: flex; align-items: baseline; gap: 6px; }
+.i-score b { font-size: 76px; line-height: 1; font-weight: 800; letter-spacing: -.04em; }
+.i-score small { color: var(--muted); font-size: 15px; }
+.i-bars { width: 100%; max-width: 260px; display: flex; flex-direction: column; gap: 10px; }
+.i-bars span { position: relative; font-size: 13px; color: var(--muted); padding-bottom: 8px; }
+.i-bars span::after { content: ""; position: absolute; left: 0; bottom: 0; height: 5px; width: var(--w); border-radius: 3px; background: var(--ink); }
+.i-bars span::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; border-radius: 3px; background: var(--line); }
+.i-pair { display: flex; align-items: center; gap: 14px; }
+.i-av { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; color: #FFFFFF; font-weight: 700; font-size: 18px; background: linear-gradient(150deg, #C9B8F2, #F5A9C2); }
+.i-av.b { background: linear-gradient(150deg, #9DB7F5, #C9B8F2); }
+.i-hrt { color: var(--heart); font-size: 30px; }
+.i-tag { font-family: var(--font-logo); font-size: 34px; font-weight: 700; }
+.i-chat { width: 100%; max-width: 280px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.i-chat span { padding: 10px 14px; border-radius: 18px; max-width: 90%; }
+.i-chat .me { align-self: flex-end; background: var(--bubble-me); color: var(--bubble-me-ink); border-bottom-right-radius: 6px; }
+.i-chat .ai { align-self: flex-start; background: var(--accent-soft); border-bottom-left-radius: 6px; }
 /* 반투명 유리: 하단 탭바, 상단바·시트 머리·입력창 테두리 (뒤 내용이 흐리게 비침) */
 .tabbar { background: var(--glass); backdrop-filter: saturate(180%) blur(24px); -webkit-backdrop-filter: saturate(180%) blur(24px); border: .5px solid var(--glass-line); box-shadow: 0 10px 30px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .14); }
 .tabbar button[aria-current="true"] { background: var(--glass-on); }
@@ -1301,6 +1338,7 @@ S.uid = ls.get("gm-uid", null);
 S.dev = ls.get("gm-dev", false);
 // 화면 모드: auto(휴대폰 설정을 따라감) / light / dark. 고른 값은 이 기기에 저장
 S.theme = ls.get("gm-theme", "auto");
+S.intro = !ls.get("gm-intro", false); S.introI = 0;
 const darkNow = () => S.theme === "dark" || (S.theme === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
 function applyTheme() {
   const r = document.documentElement;
@@ -1550,6 +1588,31 @@ function matchKeywords(o, r) {
   kw.push(personaOf(o).type.replace(/ /g, ""));
   return [...new Set(kw)].slice(0, 6);
 }
+// ---------------- 첫 방문 안내 3장 ----------------
+const INTRO = [
+  { ico: "♥", k: "궁합", t: "궁합으로 만나요", d: "관심사·생활 습관·가치관으로 궁합 점수를 계산해, 하루 3명을 골라드려요. 프로필 등급이 비슷한 사람끼리요.",
+    demo: `<div class="i-score"><small>궁합</small><b>87</b><small>점</small></div><div class="i-bars"><span style="--w:90%">관심사</span><span style="--w:75%">생활 습관</span><span style="--w:82%">가치관</span></div>` },
+  { ico: "✦", k: "매칭", t: "서로 좋아요면 연결", d: "서로 좋아요를 누르거나, 서로가 서로의 1순위면 바로 매칭돼요. 직업·키 같은 정보는 숨겨서 알아가는 재미를 남겼어요.",
+    demo: `<div class="i-pair"><span class="i-av">나</span><span class="i-hrt">♥</span><span class="i-av b">상대</span></div><div class="i-tag">It's a Match</div>` },
+  { ico: "⌖", k: "데이트", t: "핫플과 AI가 도와줘요", d: "두 사람 취향에 맞는 핫플을 지도로 추천하고, 대화가 막히면 AI 코치가 다음 말을 같이 고민해줘요.",
+    demo: `<div class="i-chat"><span class="me">주말에 뭐 하세요?</span><span class="ai">AI 추천 · "전시 좋아하시면 감천문화마을 어때요?"</span></div>` },
+];
+function introView() {
+  const i = S.introI, c = INTRO[i], last = i === INTRO.length - 1;
+  return `<div class="intro" role="dialog" aria-modal="true" aria-label="둘 사용 안내">
+    <div class="intro-top">${LOGO}<button class="intro-skip" data-act="intro-done">건너뛰기</button></div>
+    <div class="intro-card${S.enter ? "" : " swap"}" data-i="${i}">
+      <div class="intro-demo">${c.demo}</div>
+      <span class="intro-k"><i aria-hidden="true">${c.ico}</i>${String(i + 1).padStart(2, "0")} · ${c.k}</span>
+      <h2>${c.t}</h2><p>${c.d}</p>
+    </div>
+    <div class="intro-foot"><div class="intro-dots" aria-hidden="true">${INTRO.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</div>
+      <button class="intro-next" data-act="${last ? "intro-done" : "intro-next"}">${last ? "시작하기" : "다음"}${last ? "" : ICON.back}</button></div>
+  </div>`;
+}
+function introGo(d) { const n = S.introI + d; if (n < 0) return; if (n >= INTRO.length) return introDone(); S.introI = n; render(); }
+function introDone() { S.intro = false; ls.set("gm-intro", true); render(); }
+
 function celebrateView(me) {
   const w = world(), c = S.celebrate, o = c && w.byId[c.id];
   if (!o) return "";
@@ -3246,7 +3309,7 @@ function render() {
   S.enter = screen !== lastScreen;
   if (authed && !isSuspended(S.uid)) checkNewMatch(world().byId[S.uid]);
   if (authed && S.fb && S.usersLoaded && !S.seenSaved && Date.now() - (S.users[S.uid]?.seenAt || 0) > 12 * 36e5) { S.seenSaved = true; setTimeout(() => saveUser(S.uid, { seenAt: Date.now() }), 0); }
-  app.innerHTML = (authed ? (isSuspended(S.uid) ? suspendedView() : shell() + (S.hot ? hotView(world().byId[S.uid]) : "") + (S.celebrate ? celebrateView(world().byId[S.uid]) : "")) : authView()) + (S.legal ? legalView() : "");
+  app.innerHTML = (authed ? (isSuspended(S.uid) ? suspendedView() : shell() + (S.hot ? hotView(world().byId[S.uid]) : "") + (S.celebrate ? celebrateView(world().byId[S.uid]) : "")) : authView()) + (S.legal ? legalView() : "") + (S.intro ? introView() : "");
   if (S.celebrate) { celebFx(S.celebrate.fresh); S.celebrate.fresh = false; }
   if (S.hot) mountHotMap();
   if (S.prefill != null) { const ci = document.getElementById("chat-input"); if (ci) { ci.value = S.prefill; S.prefill = null; ci.focus({ preventScroll: true }); } }
@@ -3287,6 +3350,8 @@ document.addEventListener("click", e => {
       login(id); break;
     case "tab": S.tab = t.dataset.v; S.detail = null; S.chat = null; S.sigOpen = false; if (t.dataset.v === "home" && S.tab === "home") S.q = S.q; render(); window.scrollTo(0, 0); break;
     case "dev": S.dev = !S.dev; ls.set("gm-dev", S.dev); render(); break;
+    case "intro-next": introGo(1); break;
+    case "intro-done": introDone(); break;
     case "theme": S.theme = darkNow() ? "light" : "dark"; ls.set("gm-theme", S.theme); applyTheme(); render(); break;
     case "theme-set": S.theme = t.dataset.v; ls.set("gm-theme", S.theme); applyTheme(); render(); break;
     case "open": S.detail = id; render(); break;
@@ -3663,6 +3728,7 @@ document.addEventListener("input", e => {
 });
 // 맨 위에 열린 것 하나 닫기 (Esc, 핸드폰 뒤로 가기 공통)
 function closeTop() {
+  if (S.intro) { introDone(); return true; }
   if (S.celebrate) S.celebrate = null;
   else if (S.hot) S.hot = null;
   else if (S.sim) S.sim = null;
@@ -3675,8 +3741,11 @@ function closeTop() {
   render();
   return true;
 }
-const anyOpen = () => !!(S.uid && (S.celebrate || S.hot || S.sim || S.legal || S.report || S.menu || S.notifOpen || S.lightbox || S.admin || S.chat || S.detail));
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeTop(); });
+const anyOpen = () => !!S.intro || !!(S.uid && (S.celebrate || S.hot || S.sim || S.legal || S.report || S.menu || S.notifOpen || S.lightbox || S.admin || S.chat || S.detail));
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeTop(); else if (S.intro && (e.key === "ArrowRight" || e.key === "ArrowLeft")) introGo(e.key === "ArrowRight" ? 1 : -1); });
+let introX = null;
+document.addEventListener("touchstart", e => { introX = S.intro && e.target.closest(".intro") ? e.touches[0].clientX : null; }, { passive: true });
+document.addEventListener("touchend", e => { if (introX == null) return; const dx = e.changedTouches[0].clientX - introX; introX = null; if (Math.abs(dx) > 50) introGo(dx < 0 ? 1 : -1); });
 
 // 안드로이드 뒤로 가기: 시트가 열려 있으면 앱을 나가지 않고 시트만 닫음
 // 시트가 열릴 때 방문 기록을 하나 쌓고, 뒤로 가기(popstate)가 오면 맨 위 시트를 닫음

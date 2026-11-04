@@ -1,6 +1,6 @@
 // 둘 서비스워커: 홈 화면 앱으로 쓸 때 빨리 열리고, 인터넷이 끊겨도 마지막 화면은 열리게
-// (build_deploy.py가 public/sw.js로 복사하면서 20261104151440에 배포 시각을 넣음 → 새로 배포하면 옛 저장분은 지워짐)
-const CACHE = "dul-20261104151440";
+// (build_deploy.py가 public/sw.js로 복사하면서 20261104152618에 배포 시각을 넣음 → 새로 배포하면 옛 저장분은 지워짐)
+const CACHE = "dul-20261104152618";
 const SHELL = ["./", "./demo.html", "./firebase-config.js", "./manifest.webmanifest", "./demo.webmanifest",
   "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png"];
 
