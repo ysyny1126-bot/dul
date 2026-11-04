@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>둘 앱 매뉴얼</title>
+<meta name="description" content="둘(dul) 소개팅 앱의 화면별 UX/UI와 앱 로직을 한 장씩 정리한 매뉴얼">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap">
+<style>
+:root {
+  --paper: #EEF0F4; --ink: #111216; --ink-2: #4A4D57; --ink-3: #8A8E99; --line: #D9DCE3;
+  --card: #FFFFFF; --black: #111216; --accent: #5B5FE0; --heart: #D6336C;
+  --frame: #2A2C33; --frame-hi: #6B6F7A;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-size: 15px; line-height: 1.55; letter-spacing: -.01em;
+}
+a { color: inherit; }
+.sheet { max-width: 1120px; margin: 0 auto; padding: 72px 48px 96px; border-bottom: 1px solid var(--line); }
+.sheet:last-of-type { border-bottom: 0; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 56px; }
+.label { font-size: 28px; font-weight: 500; letter-spacing: -.02em; display: flex; gap: 14px; align-items: baseline; }
+.label small { font-size: 14px; color: var(--ink-3); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mark { width: 48px; height: 48px; border-radius: 14px; background: var(--black); color: #fff; display: grid; place-items: center;
+  font-family: "Dancing Script", cursive; font-size: 22px; font-weight: 700; padding-bottom: 3px; }
+.intro { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-bottom: 64px; }
+.intro h2 { margin: 0; font-size: 44px; line-height: 1.12; font-weight: 600; letter-spacing: -.035em; text-align: right; text-wrap: balance; }
+.intro p { margin: 6px 0 0; color: var(--ink-2); max-width: 400px; }
+.intro p b { color: var(--ink); }
+
+/* 휴대폰 + 양옆 설명 */
+.stage { display: grid; grid-template-columns: 1fr 324px 1fr; gap: 40px; align-items: stretch; }
+.notes { position: relative; }
+.note { position: absolute; width: 100%; max-width: 230px; transform: translateY(-50%); font-size: 14px; color: var(--ink-2); }
+.notes.left .note { right: 0; text-align: right; }
+.note b { color: var(--ink); font-weight: 700; }
+.note .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--black); color: #fff;
+  font-size: 12px; font-weight: 700; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+.note::after { content: ""; position: absolute; top: 11px; width: 28px; height: 1px; background: var(--ink-3); }
+.notes.left .note::after { right: -36px; }
+.notes.right .note::after { left: -36px; }
+
+.phone { position: relative; width: 324px; height: 677px; padding: 12px; border-radius: 56px; justify-self: center;
+  background: linear-gradient(145deg, var(--frame-hi), var(--frame) 30%, var(--frame) 70%, var(--frame-hi));
+  box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 30px 60px -20px rgba(20,22,40,.45), inset 0 0 0 2px rgba(255,255,255,.12); }
+.phone::before, .phone::after { content: ""; position: absolute; width: 3px; border-radius: 2px; background: var(--frame); }
+.phone::before { left: -3px; top: 150px; height: 56px; box-shadow: 0 72px 0 var(--frame); }
+.phone::after { right: -3px; top: 190px; height: 84px; }
+.screen { position: relative; width: 300px; height: 653px; border-radius: 44px; overflow: hidden; background: #F5F5FB; }
+.scale { position: absolute; left: 0; top: 0; width: 390px; height: 849px; transform: scale(.76923); transform-origin: 0 0; }
+.status { height: 52px; display: flex; justify-content: space-between; align-items: center; padding: 6px 34px 0 46px;
+  font-size: 17px; font-weight: 600; color: #111; background: var(--sb, #F5F5FB); position: relative; z-index: 2; transition: background .3s; }
+.status.dark { color: #fff; }
+.status svg { display: block; }
+.island { position: absolute; left: 50%; top: 11px; width: 120px; height: 35px; margin-left: -60px; border-radius: 20px; background: #000; z-index: 3; }
+.scale iframe { display: block; width: 390px; height: 797px; border: 0; background: transparent; pointer-events: none; opacity: 0; transition: opacity .35s; }
+.ready .scale iframe { opacity: 1; }
+.homebar { position: absolute; left: 50%; bottom: 7px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(0,0,0,.75); z-index: 3; }
+.loading { position: absolute; inset: 52px 0 0; display: grid; place-items: center; color: var(--ink-3); font-size: 18px; z-index: 1; }
+.dot { position: absolute; z-index: 4; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; background: var(--black); color: #fff;
+  font-size: 12px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 3px rgba(255,255,255,.9), 0 4px 10px rgba(0,0,0,.25);
+  opacity: 0; transition: opacity .4s; }
+.ready .dot { opacity: 1; }
+
+/* 표지 */
+.cover h1 { margin: 0 0 20px; font-size: 64px; line-height: 1.05; font-weight: 600; letter-spacing: -.04em; }
+.cover h1 em { font-style: normal; font-family: "Dancing Script", cursive; font-weight: 700; }
+.cover .lead { font-size: 17px; color: var(--ink-2); max-width: 560px; margin: 0 0 48px; }
+.flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin: 0 0 12px; padding: 0; list-style: none; }
+.flow li { background: var(--card); border-radius: 24px; padding: 20px 18px 22px; }
+.flow li a { text-decoration: none; display: block; }
+.flow li:nth-child(3) { background: var(--black); color: #fff; }
+.flow li:nth-child(3) span { color: #B8BAC4; }
+.flow b { display: block; font-size: 17px; margin: 10px 0 4px; }
+.flow span { font-size: 13px; color: var(--ink-3); display: block; line-height: 1.45; }
+.flow i { font-style: normal; font-size: 12px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.rule { background: var(--card); border-radius: 24px; padding: 24px; }
+.rule h3 { margin: 0 0 12px; font-size: 17px; }
+.rule ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; }
+.rule li + li { margin-top: 6px; }
+.pill { display: flex; align-items: center; gap: 14px; background: var(--black); color: #fff; border-radius: 999px; padding: 10px 24px 10px 10px; margin-top: 12px; text-decoration: none; }
+.pill .ic { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--heart); display: grid; place-items: center; flex: none; }
+.pill b { display: block; font-size: 17px; }
+.pill span { font-size: 13px; color: #B8BAC4; }
+.pill .go { margin-left: auto; font-size: 22px; }
+
+@media (max-width: 960px) {
+  .sheet { padding: 48px 16px 64px; }
+  .top { margin-bottom: 32px; }
+  .label { font-size: 22px; }
+  .intro { grid-template-columns: 1fr; gap: 12px; margin-bottom: 36px; }
+  .intro h2 { text-align: left; font-size: 34px; }
+  .stage { display: flex; flex-direction: column; gap: 10px; }
+  .phone { order: 0; margin-bottom: 22px; }
+  .notes { display: contents; }
+  .note, .notes.left .note { position: static; transform: none; max-width: none; text-align: left; background: var(--card); border-radius: 18px; padding: 14px 16px; }
+  .note br { display: none; }
+  .note::after { display: none; }
+  .note .n { margin: 0 8px 0 0; vertical-align: -5px; }
+  .cover h1 { font-size: 44px; }
+  .flow { grid-template-columns: repeat(2, 1fr); }
+  .rules { grid-template-columns: 1fr; }
+}
+@media (max-width: 360px) { .phone { transform: scale(.92); transform-origin: top center; margin-bottom: -54px; } }
+@media print { .sheet { break-after: page; border: 0; } body { background: #fff; } }
+</style>
+</head>
+<body>
+
+<section class="sheet cover">
+  <div class="top"><div class="label">App Guide <small>dul · 둘</small></div><div class="mark">d</div></div>
+  <h1>좋은 사람과,<br>더 좋은 날을. <em>dul</em></h1>
+  <p class="lead">둘은 관심사·거리·생활 습관·가치관으로 궁합을 계산해, <b>비슷한 등급끼리</b> 하루 추천을 보여주는 모바일 소개팅 앱이에요. 아래는 화면 6장으로 정리한 사용 흐름과 앱 로직이에요.</p>
+  <ol class="flow">
+    <li><a href="#s1"><i>01</i><b>시작</b><span>로그인 · 회원가입</span></a></li>
+    <li><a href="#s2"><i>02</i><b>추천</b><span>오늘의 궁합 순위</span></a></li>
+    <li><a href="#s3"><i>03</i><b>매칭</b><span>서로 좋아요 = 연결</span></a></li>
+    <li><a href="#s4"><i>04</i><b>핫플</b><span>둘의 취향 장소</span></a></li>
+    <li><a href="#s5"><i>05</i><b>채팅</b><span>AI 코치와 대화</span></a></li>
+    <li><a href="#s6"><i>06</i><b>내 정보</b><span>프로필 등급 관리</span></a></li>
+  </ol>
+  <div class="rules">
+    <div class="rule"><h3>추천 로직</h3><ul>
+      <li>관심사·거리·생활 습관·가치관을 합쳐 궁합 점수(0~100)를 계산</li>
+      <li>서로가 서로의 1순위면 좋아요 없이 <b>자동 매칭</b></li>
+      <li>상대의 직업·키·MBTI·가치관은 <b>점수에만 반영</b>하고 화면엔 숨김</li>
+    </ul></div>
+    <div class="rule"><h3>등급 로직</h3><ul>
+      <li>프로필 점수 100점: 사진·인증·자기소개·관심사·기본 정보·최근 활동</li>
+      <li>브론즈 → 실버 → 골드 → 플래티넘 → 다이아</li>
+      <li>내 등급 <b>±1 등급</b>끼리 추천 (사람이 적은 지역은 넓게)</li>
+    </ul></div>
+    <div class="rule"><h3>다음 매칭 로직</h3><ul>
+      <li>동시에 <b>3명까지</b> 대화</li>
+      <li>매칭된 사람은 다음 추천에서 빠지고, 빈자리는 다음 날 채움</li>
+      <li><b>집중 모드</b>는 새 추천을 쉬고, <b>대화 마치기</b>는 서로 다시 추천 안 됨</li>
+    </ul></div>
+  </div>
+  <a class="pill" href="demo.html">
+    <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 3.2 4.5 6.9 4.5c2.1 0 3.6 1.1 5.1 2.9 1.5-1.8 3-2.9 5.1-2.9 3.7 0 6 3.7 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg></span>
+    <span><b>가상 회원 500명</b><span>시연판에서 직접 써보기</span></span><span class="go">›</span></a>
+</section>
+
+<section class="sheet" id="s1" data-shot="auth">
+  <div class="top"><div class="label">Sign In <small>01</small></div><div class="mark">d</div></div>
+  <div class="intro">
+    <h2>시작은<br>가볍게.</h2>
+    <p>둘의 첫 화면은 <b>로그인과 회원가입을 한 화면</b>에서 전환해요. 핸드폰 홈 화면에 추가하면 앱처럼 전체 화면으로 열리고, 뒤로 가기도 앱처럼 동작해요.</p>
+  </div>
+  <div class="stage">
+    <div class="notes left">
+      <div class="note" style="top:18%"><span class="n">1</span><br><b>브랜드 헤더</b>는 로고와 한 줄 소개로 어떤 앱인지 바로 알려줘요.</div>
+      <div class="note" style="top:62%"><span class="n">3</span><br><b>로그인 폼</b>은 아이디·비밀번호 두 칸뿐이에요. 회원가입은 사진·관심사·생활 습관을 단계별로 받아요.</div>
+    </div>
+    <div class="phone"><div class="screen"><div class="island"></div><div class="homebar"></div><div class="scale"></div></div>
+      <span class="dot" style="left:80%;top:14%">1</span><span class="dot" style="left:86%;top:40%">2</span><span class="dot" style="left:12%;top:62%">3</span><span class="dot" style="left:88%;top:92%">4</span></div>
+    <div class="notes right">
+      <div class="note" style="top:40%"><span class="n">2</span><br><b>로그인 · 회원가입 탭</b>으로 화면 이동 없이 바로 바꿔요.</div>
+      <div class="note" style="top:90%"><span class="n">4</span><br><b>가상 회원 바로 입장</b> (시연판) — 누르면 비밀번호 없이 그 회원으로 체험해요.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="s2" data-shot="home">
+  <div class="top"><div class="label">Home Screen <small>02</small></div><div class="mark">d</div></div>
+  <div class="intro">
+    <h2>오늘의 인연을<br>한눈에.</h2>
+    <p><b>추천</b> 탭은 둘의 중심이에요. 매일 궁합 순위로 사람을 보여주고, 등급·검색·시뮬레이션을 한 화면에 모았어요. 아래 <b>탭바</b>로 추천·매칭·채팅·내 정보를 오가요.</p>
+  </div>
+  <div class="stage">
+    <div class="notes left">
+      <div class="note" style="top:21%"><span class="n">1</span><br><b>내 등급</b>을 보여주고, 비슷한 등급(±1)끼리 고른 추천이라고 알려줘요.</div>
+      <div class="note" style="top:56%"><span class="n">3</span><br><b>자동 매칭 카드</b> — 서로가 서로의 1순위면 바로 연결돼요. 마음 표현 버튼으로 첫 신호를 보내요.</div>
+    </div>
+    <div class="phone"><div class="screen"><div class="island"></div><div class="homebar"></div><div class="scale"></div></div>
+      <span class="dot" style="left:70%;top:21%">1</span><span class="dot" style="left:90%;top:33%">2</span><span class="dot" style="left:10%;top:56%">3</span><span class="dot" style="left:90%;top:82%">4</span></div>
+    <div class="notes right">
+      <div class="note" style="top:33%"><span class="n">2</span><br><b>관심사 검색</b>과 <b>만약에?</b> — 거리·관심사 가중치를 바꾸면 순위가 어떻게 바뀌는지 미리 봐요.</div>
+      <div class="note" style="top:80%"><span class="n">4</span><br><b>추천 카드</b>는 A~D 평가, 궁합 점수, 상대 등급, 페르소나 한 줄만 보여줘요. 세부 정보는 알아가는 재미로 남겨요.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="s3" data-shot="celebrate" data-sb="rgb(40, 38, 62)">
+  <div class="top"><div class="label">It's a Match <small>03</small></div><div class="mark">d</div></div>
+  <div class="intro">
+    <h2>서로 좋아요면,<br>바로 연결.</h2>
+    <p>매칭이 성사되면 <b>축하 화면</b>이 떠요. 상대 얼굴을 크게, 궁합 점수를 가장 눈에 띄게, 나머지는 작은 키워드로만 보여줘요.</p>
+  </div>
+  <div class="stage">
+    <div class="notes left">
+      <div class="note" style="top:14%"><span class="n">1</span><br><b>어떻게 연결됐는지</b> — 서로 좋아요인지, 서로 1순위라 자동 매칭인지 알려줘요.</div>
+      <div class="note" style="top:66%"><span class="n">3</span><br><b>궁합 점수 + 키워드</b> — 직업·키·MBTI는 숨기고, 점수와 '결혼관 일치' 같은 키워드만 보여줘요.</div>
+    </div>
+    <div class="phone"><div class="screen"><div class="island"></div><div class="homebar"></div><div class="scale"></div></div>
+      <span class="dot" style="left:12%;top:17%">1</span><span class="dot" style="left:88%;top:52%">2</span><span class="dot" style="left:12%;top:68%">3</span><span class="dot" style="left:88%;top:86%">4</span></div>
+    <div class="notes right">
+      <div class="note" style="top:50%"><span class="n">2</span><br><b>큰 얼굴 사진</b>과 이름·나이·지역·등급 배지.</div>
+      <div class="note" style="top:86%"><span class="n">4</span><br><b>다음 행동</b> — 대화 시작, 취향 핫플 보기, 나중에. '다음 매칭은 어떻게 되나요?'에서 규칙을 바로 확인해요.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="s4" data-shot="hot">
+  <div class="top"><div class="label">Hot Place <small>04</small></div><div class="mark">d</div></div>
+  <div class="intro">
+    <h2>둘의 취향 사이,<br>딱 그곳.</h2>
+    <p>매칭된 두 사람의 <b>관심사와 위치</b>로 첫 만남 장소를 골라줘요. 지도 앱으로 바로 열고, 버튼 하나로 채팅에 제안해요.</p>
+  </div>
+  <div class="stage">
+    <div class="notes left">
+      <div class="note" style="top:24%"><span class="n">1</span><br><b>지도</b>에 나·상대 위치와 추천 핀 번호를 함께 찍어요.</div>
+      <div class="note" style="top:70%"><span class="n">3</span><br><b>네이버 지도 · 카카오맵</b>으로 바로 길찾기를 열어요.</div>
+    </div>
+    <div class="phone"><div class="screen"><div class="island"></div><div class="homebar"></div><div class="scale"></div></div>
+      <span class="dot" style="left:12%;top:24%">1</span><span class="dot" style="left:88%;top:58%">2</span><span class="dot" style="left:12%;top:72%">3</span><span class="dot" style="left:88%;top:80%">4</span></div>
+    <div class="notes right">
+      <div class="note" style="top:56%"><span class="n">2</span><br><b>추천 이유</b> — 누구의 취향 때문인지, 각자 얼마나 먼지 보여줘요.</div>
+      <div class="note" style="top:82%"><span class="n">4</span><br><b>이 핫플 제안하기</b>를 누르면 채팅방에 장소가 바로 보내져요.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="s5" data-shot="chat">
+  <div class="top"><div class="label">Chat <small>05</small></div><div class="mark">d</div></div>
+  <div class="intro">
+    <h2>어색하지 않게,<br>대화를 이어요.</h2>
+    <p>매칭된 사람과만 대화할 수 있어요. 첫마디가 어려우면 <b>AI 코치</b>가 답장과 다음 질문을 추천해줘요. 시연판의 가상 회원은 대화 데이터와 AI로 직접 답장해요.</p>
+  </div>
+  <div class="stage">
+    <div class="notes left">
+      <div class="note" style="top:14%"><span class="n">1</span><br><b>두 분 취향 핫플 TOP 3</b>가 대화 위에 떠 있어요. 누르면 핫플 지도로 가요.</div>
+      <div class="note" style="top:92%"><span class="n">3</span><br><b>AI 버튼</b> — 답장 추천과 말투 선택. 상대 비공개 정보는 AI에도 보내지 않아요.</div>
+    </div>
+    <div class="phone"><div class="screen"><div class="island"></div><div class="homebar"></div><div class="scale"></div></div>
+      <span class="dot" style="left:88%;top:15%">1</span><span class="dot" style="left:88%;top:62%">2</span><span class="dot" style="left:77%;top:89%">3</span></div>
+    <div class="notes right">
+      <div class="note" style="top:62%"><span class="n">2</span><br><b>대화</b> — 공통 관심사로 이야기를 시작하고, 사진도 보낼 수 있어요. 오른쪽 위 메뉴에서 신고·차단·대화 마치기.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="s6" data-shot="me">
+  <div class="top"><div class="label">My Profile <small>06</small></div><div class="mark">d</div></div>
+  <div class="intro">
+    <h2>좋은 만남은<br>좋은 프로필에서.</h2>
+    <p>등급은 외모가 아니라 <b>프로필을 얼마나 채우고 관리하는지</b>로만 매겨요. 무엇을 하면 점수가 오르는지 항목마다 바로 알려줘요.</p>
+  </div>
+  <div class="stage">
+    <div class="notes left">
+      <div class="note" style="top:21%"><span class="n">1</span><br><b>프로필 등급 + 점수</b> — 다음 등급까지 몇 점 남았는지 진행 바로 보여줘요.</div>
+      <div class="note" style="top:86%"><span class="n">3</span><br><b>내 프로필 카드</b> — 사진 등록, 자기소개·관심사 수정.</div>
+    </div>
+    <div class="phone"><div class="screen"><div class="island"></div><div class="homebar"></div><div class="scale"></div></div>
+      <span class="dot" style="left:12%;top:22%">1</span><span class="dot" style="left:88%;top:52%">2</span><span class="dot" style="left:12%;top:86%">3</span></div>
+    <div class="notes right">
+      <div class="note" style="top:52%"><span class="n">2</span><br><b>항목별 점수와 팁</b> — 사진·인증·자기소개·관심사·기본 정보·최근 활동. 빨간 글씨가 다음 할 일이에요.</div>
+    </div>
+  </div>
+</section>
+
+<script>
+// 진짜 앱(demo.html)을 아이폰 틀 안에 띄우고, 화면마다 앱 상태를 바꿔서 보여줘요.
+// 저장소(localStorage)는 건드리지 않게 메모리로 바꿔둬요.
+const PRE = `(function(){var mem={};ls.get=function(k,d){return k in mem?mem[k]:d};ls.set=function(k,v){mem[k]=v};
+  document.documentElement.dataset.theme="light";S.dev=false;S.notifOpen=false;S.legal=null;S.hot=null;S.celebrate=null;S.chat=null;S.detail=null;S.sim=null;})();
+  var ME=BASE.showcase[0], O=(matchesOf(ME)[0]||{}).id;`;
+const SHOTS = {
+  auth: `S.uid=null;S.authTab="login";render();`,
+  home: `S.uid=ME;S.tab="home";render();`,
+  celebrate: `S.uid=ME;S.tab="home";render();S.celebrate={id:O,via:"auto",fresh:true};render();`,
+  hot: `S.uid=ME;S.tab="chat";S.chat=O;S.hot=O;S.hotSel=0;S.hotPage=0;render();`,
+  chat: `S.uid=ME;S.tab="chat";S.chat=O;var t=Date.now()-36e5,k=pk(ME,O);
+    S.chats[k]={pair:k.split("_"),updatedAt:t,messages:[
+      {from:ME,text:"안녕하세요! 책 좋아하신다고 해서 반가웠어요 😊",at:t},
+      {from:O,text:"반가워요! 요즘은 소설 위주로 읽고 있어요. 혹시 요즘 가본 맛집 있어요?",at:t+6e4},
+      {from:ME,text:"전포에 작은 파스타집 다녀왔는데 진짜 맛있었어요",at:t+12e4},
+      {from:O,text:"오 전포 좋죠! 저도 거기 카페 거리 자주 가요. 다음에 추천해주세요ㅎㅎ",at:t+18e4}]};
+    render();`,
+  me: `S.uid=ME;S.tab="me";render();`,
+};
+
+function statusBar() {
+  return `<div class="status"><span>9:41</span><span style="display:flex;gap:6px;align-items:center">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.2-1.3A10.5 10.5 0 0 0 8 .8 10.5 10.5 0 0 0 .8 3.7L2 5c1.6-1.5 3.7-2.4 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4.4 6.7 6.7 0 0 0 3.4 6.2l1.2 1.3C5.5 6.7 6.7 6.2 8 6.2zM8 9.6 6 11.6 8 12l2-.4z"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="currentColor" opacity=".5"/></svg></span></div>`;
+}
+
+function mount(sec) {
+  const box = sec.querySelector(".scale"), key = sec.dataset.shot;
+  box.innerHTML = statusBar() + `<div class="loading">불러오는 중…</div><iframe title="둘 앱 화면" tabindex="-1" aria-hidden="true" src="demo.html?manual"></iframe>`;
+  const fr = box.querySelector("iframe"), sb = box.querySelector(".status");
+  fr.addEventListener("load", () => {
+    let tries = 0;
+    const tick = () => {
+      const w = fr.contentWindow;
+      let ok = false;
+      try { ok = w.eval(`typeof render==="function"&&typeof world==="function"&&!!world().byId&&!!BASE.showcase`); } catch (e) {}
+      if (!ok) { if (++tries < 80) setTimeout(tick, 150); return; }
+      try { w.eval(PRE + SHOTS[key]); } catch (e) { console.warn(key, e); }
+      setTimeout(() => {
+        const d = w.document;
+        // 상단바 색을 앱 맨 위 색과 맞춰요 (rgb()·color(srgb) 둘 다 읽어요)
+        const rgb = el => {
+          const c = getComputedStyle(el).backgroundColor, v = (c.match(/[\d.]+/g) || []).map(Number);
+          if (/^color\(/.test(c)) return v.length > 3 && v[3] < .5 ? null : v.slice(0, 3).map(x => x * 255);
+          return v.length < 3 || (v.length > 3 && v[3] < .5) ? null : v.slice(0, 3);
+        };
+        const hit = [d.elementFromPoint(20, 4), d.querySelector("header.bar"), d.body].filter(Boolean);
+        let c = null;
+        for (let el = hit[0]; el && !c; el = el.parentElement) c = rgb(el);
+        c = c || rgb(d.body) || [245, 245, 251];
+        const bg = sec.dataset.sb || `rgb(${c.map(Math.round).join(",")})`;
+        sb.style.setProperty("--sb", bg);
+        const m = bg.match(/[\d.]+/g).map(Number);
+        if (m[0] * .3 + m[1] * .59 + m[2] * .11 < 140) sb.classList.add("dark");
+        const log = d.getElementById("chat-log"); if (log) log.scrollTop = log.scrollHeight;
+        box.querySelector(".loading")?.remove();
+        sec.querySelector(".phone").classList.add("ready");
+      }, key === "hot" ? 900 : 450);
+    };
+    tick();
+  });
+}
+
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); mount(e.target); } }), { rootMargin: "600px 0px" });
+document.querySelectorAll("[data-shot]").forEach(s => io.observe(s));
+// 좁은 화면에서는 설명을 1, 2, 3… 순서로 세워요
+document.querySelectorAll(".note").forEach(n => { n.style.order = n.querySelector(".n").textContent; });
+</script>
+</body>
+</html>
