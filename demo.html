@@ -107,6 +107,11 @@ img { max-width: 100%; }
   --tab-ink: rgba(255, 255, 255, .62);
   --tab-on: #FFFFFF;
   --tab-on-ink: #111216;
+  --glass: rgba(17, 18, 22, .56);
+  --glass-line: rgba(255, 255, 255, .22);
+  --glass-on: rgba(255, 255, 255, .92);
+  --edge: color-mix(in srgb, #F2F2F7 66%, transparent);
+  --edge-line: rgba(0, 0, 0, .07);
   --font-logo: "Dancing Script", cursive;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-hand: var(--font-display);
@@ -121,7 +126,8 @@ img { max-width: 100%; }
     --pink: #4A2230; --pink-ink: #FFB3C4; --mint: #8E8E93; --mint-deep: #F5F5F7; --accent2: #F5F5F7; --accent2-soft: #2C2C2E; --lilac: #2C2C2E; --strip: #1C1C1E; --chip: #2C2C2E;
     --bubble-me: #F5F5F7; --bubble-me-ink: #000000; --bubble-them: #1C1C1E;
     --good: #30D158; --bad: #FF6961; --bad-soft: #3A1E1E; --scrim: rgba(0, 0, 0, .6); --shadow: none; --shadow-btn: none;
-    --tab: #1C1C1E; --tab-ink: rgba(255, 255, 255, .6); --tab-on: #F5F5F7; --tab-on-ink: #000000; color-scheme: dark;
+    --tab: #1C1C1E; --tab-ink: rgba(255, 255, 255, .6); --tab-on: #F5F5F7; --tab-on-ink: #000000;
+    --glass: rgba(44, 44, 46, .52); --glass-line: rgba(255, 255, 255, .14); --glass-on: rgba(245, 245, 247, .92); --edge: rgba(0, 0, 0, .6); --edge-line: rgba(255, 255, 255, .09); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
@@ -131,7 +137,8 @@ img { max-width: 100%; }
     --pink: #4A2230; --pink-ink: #FFB3C4; --mint: #8E8E93; --mint-deep: #F5F5F7; --accent2: #F5F5F7; --accent2-soft: #2C2C2E; --lilac: #2C2C2E; --strip: #1C1C1E; --chip: #2C2C2E;
     --bubble-me: #F5F5F7; --bubble-me-ink: #000000; --bubble-them: #1C1C1E;
     --good: #30D158; --bad: #FF6961; --bad-soft: #3A1E1E; --scrim: rgba(0, 0, 0, .6); --shadow: none; --shadow-btn: none;
-    --tab: #1C1C1E; --tab-ink: rgba(255, 255, 255, .6); --tab-on: #F5F5F7; --tab-on-ink: #000000; color-scheme: dark;
+    --tab: #1C1C1E; --tab-ink: rgba(255, 255, 255, .6); --tab-on: #F5F5F7; --tab-on-ink: #000000;
+    --glass: rgba(44, 44, 46, .52); --glass-line: rgba(255, 255, 255, .14); --glass-on: rgba(245, 245, 247, .92); --edge: rgba(0, 0, 0, .6); --edge-line: rgba(255, 255, 255, .09); color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -803,6 +810,12 @@ main { padding-block: 6px 120px; gap: 14px; }
 .hero { border-radius: 32px; box-shadow: none; }
 .hero .logo span { text-shadow: none; }
 .msg.them { box-shadow: var(--shadow); }
+/* 반투명 유리: 하단 탭바, 상단바·시트 머리·입력창 테두리 (뒤 내용이 흐리게 비침) */
+.tabbar { background: var(--glass); backdrop-filter: saturate(180%) blur(24px); -webkit-backdrop-filter: saturate(180%) blur(24px); border: .5px solid var(--glass-line); box-shadow: 0 10px 30px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .14); }
+.tabbar button[aria-current="true"] { background: var(--glass-on); }
+.tabbar .badge { box-shadow: none; }
+.bar { background: var(--edge); border-bottom: .5px solid var(--edge-line); }
+.sheet-head, .composer { background: color-mix(in srgb, var(--surface) 68%, transparent); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-color: var(--edge-line); }
 </style>
 
 <div id="app"></div>
